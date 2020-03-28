@@ -1,0 +1,1 @@
+http://search.cpan.org/~jpjeon/Crypt-SEED-0.01/SEED.pm

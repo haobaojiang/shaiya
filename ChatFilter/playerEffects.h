@@ -1,0 +1,4 @@
+namespace playerEffects
+{
+	void Start();
+};

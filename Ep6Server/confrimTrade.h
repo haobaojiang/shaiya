@@ -1,0 +1,17 @@
+namespace confrimTrade
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

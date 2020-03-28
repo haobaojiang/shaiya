@@ -1,0 +1,4 @@
+namespace purchaseDelay
+{
+	void Start();
+};

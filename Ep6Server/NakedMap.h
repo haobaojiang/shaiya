@@ -1,0 +1,17 @@
+namespace ShaiyaNakedMap{
+	void StartNakedMap();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="DataBase.cpp">
+      <Filter>database</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="AutoExp.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoKills.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatFilter.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomPackets.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="FantasyPvp.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ffa.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="getPlayer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="NakedMap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="NtPlayer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="purchaseDelay.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="randomRes.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="recrune.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ResProtect.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ShareKills.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="singleparty.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="TradeChannel.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="autoSummon.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoPoint.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBase.h">
+      <Filter>database</Filter>
+    </ClInclude>
+    <ClInclude Include="maxEnchant.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DropsRange.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="mobs.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="levelReward.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="namecolor.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="costume.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="autoMob.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pvpDrops.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="mobNotice.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="randomReward.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="enchantDelay.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="blockchat.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="confrimTrade.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="vsFixed.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="statsFixed.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="setitem.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="backDoor.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="expRemoving.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="onLogin.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ep6">
+      <UniqueIdentifier>{dfd0fa4d-6981-4013-a899-a723f93ecebd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{74d9bd46-d28b-46a4-9f06-796c85de636f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="database">
+      <UniqueIdentifier>{41ea9064-fa44-48c0-90f1-3e2ad4cae680}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,17 @@
+namespace BaseSkill
+{
+	void Start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

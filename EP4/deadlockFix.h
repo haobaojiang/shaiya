@@ -1,0 +1,4 @@
+namespace deadlockFix
+{
+	void Start();
+};

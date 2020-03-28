@@ -1,0 +1,171 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// µÂÓï(µÂ¹ú) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG1 DIALOGEX 50, 50, 573, 207
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "© Disconnect (elitepvpers.de)",IDC_STATIC,473,196,98,8
+    PUSHBUTTON      "Hide [F5]",IDC_BUTTON5,521,2,50,12
+END
+
+IDD_DIALOG2 DIALOGEX 0, 20, 565, 188
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LISTBOX         IDC_LIST1,7,7,550,112,LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Send",IDC_BUTTON1,507,142,50,14
+    PUSHBUTTON      "Clear",IDC_BUTTON2,507,124,50,14
+    PUSHBUTTON      "Selected packets to clipboard",IDC_BUTTON3,7,126,105,11
+    PUSHBUTTON      "All packets to clipboard",IDC_BUTTON4,121,126,105,11
+    EDITTEXT        IDC_EDIT1,7,143,493,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Start",IDC_BUTTON6,263,124,39,14
+    PUSHBUTTON      "Stop",IDC_BUTTON7,310,124,39,14,WS_DISABLED
+    PUSHBUTTON      "Recv",IDC_BUTTON5,507,159,50,14
+    EDITTEXT        IDC_EDIT5,7,160,493,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Exclude it",IDC_Exclude,359,123,38,15
+END
+
+IDD_DIALOG3 DIALOGEX 0, 20, 422, 176
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Position",IDC_STATIC,15,48,75,56
+    EDITTEXT        IDC_EDIT1,42,58,44,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT2,42,72,44,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT3,42,86,44,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "X",IDC_STATIC,22,60,8,8
+    LTEXT           "Y",IDC_STATIC,22,74,8,8
+    LTEXT           "Z",IDC_STATIC,22,88,8,8
+    PUSHBUTTON      "Start Bot [F6]",IDC_BUTTON1,24,147,66,14,WS_DISABLED
+    EDITTEXT        IDC_EDIT4,42,23,48,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Player ID",IDC_STATIC,7,26,30,8
+    LTEXT           "Hunting Radius",IDC_STATIC,7,127,49,8
+    EDITTEXT        IDC_EDIT5,60,124,30,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Pick Items",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,54,48,10
+    LTEXT           "Killcount",IDC_STATIC,117,26,27,8
+    EDITTEXT        IDC_EDIT6,147,23,40,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "Sell Items",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,68,47,10
+    CONTROL         "Repair Equipment",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,82,72,10
+    LISTBOX         IDC_LIST1,306,21,90,85,LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST2,207,21,90,85,LBS_NOINTEGRALHEIGHT | LBS_NOSEL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Use Selected Skills",IDC_BUTTON4,316,116,70,14
+    LTEXT           "Distance",IDC_STATIC,103,127,28,8
+    EDITTEXT        IDC_EDIT7,138,124,22,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Use Only Skills",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,96,61,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 571
+        TOPMARGIN, 2
+        BOTTOMMARGIN, 204
+    END
+
+    IDD_DIALOG2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 557
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 177
+        HORZGUIDE, 131
+        HORZGUIDE, 152
+    END
+
+    IDD_DIALOG3, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 414
+        VERTGUIDE, 15
+        VERTGUIDE, 22
+        VERTGUIDE, 42
+        VERTGUIDE, 90
+        VERTGUIDE, 117
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 165
+        HORZGUIDE, 30
+        HORZGUIDE, 48
+        HORZGUIDE, 64
+        HORZGUIDE, 78
+        HORZGUIDE, 92
+        HORZGUIDE, 131
+        HORZGUIDE, 161
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // µÂÓï(µÂ¹ú) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

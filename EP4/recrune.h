@@ -1,0 +1,17 @@
+namespace RecRune
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

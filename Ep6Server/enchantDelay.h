@@ -1,0 +1,17 @@
+namespace enchantDelay
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,12 @@
+
+
+namespace TradeChannel{
+	void StartTradeChannel();
+};
+
+
+
+
+
+
+

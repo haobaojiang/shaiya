@@ -1,0 +1,5 @@
+
+namespace AutoExp
+{
+	void Start();
+};

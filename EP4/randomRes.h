@@ -1,0 +1,17 @@
+namespace randomRes
+{
+	void Start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

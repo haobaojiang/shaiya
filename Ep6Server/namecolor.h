@@ -1,0 +1,4 @@
+namespace NameColor
+{
+	void Start();
+};

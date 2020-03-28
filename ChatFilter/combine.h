@@ -1,0 +1,5 @@
+
+namespace combine
+{
+	void Start();
+};

@@ -1,0 +1,17 @@
+namespace AutoKills
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

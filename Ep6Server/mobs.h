@@ -1,0 +1,17 @@
+namespace enumMobs
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

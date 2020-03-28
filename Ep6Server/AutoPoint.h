@@ -1,0 +1,17 @@
+namespace AutoPoint
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

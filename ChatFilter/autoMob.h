@@ -1,0 +1,5 @@
+
+namespace AutoMob
+{
+	void Start();
+};

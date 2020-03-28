@@ -1,0 +1,4 @@
+namespace killtitle
+{
+	void Start();
+};

@@ -1,0 +1,4 @@
+namespace ShaiyaShareKills
+{
+	void StartShareKill();
+};

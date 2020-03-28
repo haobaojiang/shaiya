@@ -1,0 +1,6 @@
+namespace ShareKills
+{
+	void Start();
+}
+
+

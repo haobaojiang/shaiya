@@ -1,0 +1,17 @@
+namespace itemForMap
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

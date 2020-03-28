@@ -1,0 +1,5 @@
+
+namespace Hunting
+{
+	void Start();
+};

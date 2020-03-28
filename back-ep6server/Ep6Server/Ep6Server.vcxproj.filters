@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="ChatFilter.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+    <ClCompile Include="NakedMap.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+    <ClCompile Include="ShareKills.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+    <ClCompile Include="TradeChannel.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+    <ClCompile Include="NtPlayer.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+    <ClCompile Include="DataBase.cpp" />
+    <ClCompile Include="FantasyPvp.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomPackets.cpp">
+      <Filter>ep6</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="ChatFilter.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="NakedMap.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="ShareKills.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="SummonWithMap.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="TradeChannel.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="NtPlayer.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CustomGame\define.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBase.h" />
+    <ClInclude Include="FantasyPvp.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomPackets.h">
+      <Filter>ep6</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ep6">
+      <UniqueIdentifier>{dfd0fa4d-6981-4013-a899-a723f93ecebd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

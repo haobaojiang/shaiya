@@ -1,0 +1,17 @@
+namespace AntiStatPad
+{
+	void Start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

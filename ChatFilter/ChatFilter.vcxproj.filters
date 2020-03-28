@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="onLogin.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="config.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="callBack.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="skillCutting.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="namecolor.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="hijack.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="killsRanking.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="combine.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="header">
+      <UniqueIdentifier>{41ad5533-67c8-4f91-99a7-e24c345ec269}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features">
+      <UniqueIdentifier>{6ed0e611-2a05-4057-b377-be5425a4e923}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

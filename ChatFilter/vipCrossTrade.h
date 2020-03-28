@@ -1,0 +1,4 @@
+namespace vipCrossTrade
+{
+	void Start();
+};

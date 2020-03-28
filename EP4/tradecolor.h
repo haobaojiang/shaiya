@@ -1,0 +1,4 @@
+namespace TradeColor
+{
+	void Start();
+};

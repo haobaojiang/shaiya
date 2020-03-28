@@ -1,0 +1,17 @@
+namespace vsFixed
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

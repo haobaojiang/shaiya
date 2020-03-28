@@ -1,0 +1,17 @@
+namespace autoSummon
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

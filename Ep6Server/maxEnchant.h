@@ -1,0 +1,17 @@
+namespace maxEnchant
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

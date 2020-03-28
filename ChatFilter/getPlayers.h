@@ -1,0 +1,5 @@
+
+namespace GetPlayers
+{
+	void Start();
+};

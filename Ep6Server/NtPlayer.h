@@ -1,0 +1,12 @@
+namespace NtPlayer
+{
+	void StartNtPlayer();
+};
+
+
+
+
+
+
+
+

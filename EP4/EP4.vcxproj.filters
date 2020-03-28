@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="killsRanking.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="namecolor.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="skillCutting.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="hijack.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="config.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="callBack.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="onLogin.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="instantMount.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="itemMap.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="encryptReadChar.h">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="enhanceDelay.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="features">
+      <UniqueIdentifier>{16aeb1db-4bb8-40d1-abda-acdc8cc9091e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header">
+      <UniqueIdentifier>{3ffbdb47-1720-43c6-8f8d-f0b8a75b5012}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

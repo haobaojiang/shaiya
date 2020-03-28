@@ -1,0 +1,10 @@
+
+namespace BlockChat{
+	void Start();
+};
+
+
+
+
+
+

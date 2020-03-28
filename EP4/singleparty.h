@@ -1,0 +1,17 @@
+namespace SingleParty
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

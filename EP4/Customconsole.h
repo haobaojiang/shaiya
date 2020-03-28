@@ -1,0 +1,10 @@
+namespace Customconsole {
+	void Start();
+}
+
+
+
+
+
+
+

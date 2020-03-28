@@ -1,0 +1,4 @@
+namespace svrMsgColor
+{
+	void Start();
+};

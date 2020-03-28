@@ -1,0 +1,3 @@
+namespace costume {
+	void Start();
+}

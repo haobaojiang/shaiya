@@ -1,0 +1,10 @@
+
+namespace CharFilter{
+	void Start();
+};
+
+
+
+
+
+

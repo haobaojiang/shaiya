@@ -1,0 +1,4 @@
+namespace onLineInfToClient
+{
+	void Start();
+};

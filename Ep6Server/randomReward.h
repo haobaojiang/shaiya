@@ -1,0 +1,17 @@
+namespace randomReward
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

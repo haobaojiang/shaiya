@@ -1,0 +1,5 @@
+
+namespace mobNotice
+{
+	void Start();
+};

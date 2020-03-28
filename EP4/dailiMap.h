@@ -1,0 +1,10 @@
+namespace dailiMap {
+	void Start();
+}
+
+
+
+
+
+
+

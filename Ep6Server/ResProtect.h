@@ -1,0 +1,17 @@
+namespace resProtect
+{
+	void start();
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

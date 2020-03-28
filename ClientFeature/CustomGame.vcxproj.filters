@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="源文件\9.0">
+      <UniqueIdentifier>{1d74aacf-5356-450c-87f2-534dfca92f10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\d3d_hook">
+      <UniqueIdentifier>{233dd1f9-de3b-489a-b316-c7864b3d3d22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\minhook">
+      <UniqueIdentifier>{48789909-f049-452e-9c42-a2239b10270f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\minhook\include">
+      <UniqueIdentifier>{d12d9eed-185c-4d07-87b5-42ceca880a30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\imgui">
+      <UniqueIdentifier>{732554a9-02ee-4bc5-918a-55312e0b3243}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\5.0">
+      <UniqueIdentifier>{17e61b22-8a85-4462-9976-252388c19a7b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="90.h">
+      <Filter>源文件\9.0</Filter>
+    </ClInclude>
+    <ClInclude Include="50.h">
+      <Filter>源文件\5.0</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

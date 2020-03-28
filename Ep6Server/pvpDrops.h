@@ -1,0 +1,5 @@
+
+namespace PvpDrops
+{
+	void Start();
+};
