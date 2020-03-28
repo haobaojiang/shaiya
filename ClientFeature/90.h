@@ -2,274 +2,16 @@
 #include <windows.h>
 #include <mutex>
 #include "../utility/utility.h"
+#include "../utility/native.h"
+#include "../utility/file.h"
 #include "kiero.h"
-
-// #define  SHAIYA_WINDOW 0
-#ifdef SHAIYA_WINDOW
-#include <d3d9.h>
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_dx9.h"
-#include "imgui/imgui_impl_win32.h"
-#endif // SHAIYA_WINDOW
 #include <assert.h>
+#include <wil/resource.h>
+#include <map>
+#include "VMProtectSDK.h"
 
-
-// #pragma comment(lib,"E:\\code\\ShaiyaFixProject\\ClientFeature\\Debug\\libMinHook.x86.lib")
 namespace Shaiya90
 {
-#ifdef SHAIYA_WINDOW
-	namespace GameWindow {
-
-		// Create the type of function that we will hook
-		typedef long(__stdcall* EndScene)(LPDIRECT3DDEVICE9);
-		static EndScene oEndScene = nullptr;
-
-		typedef long(__stdcall* Reset)(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresParam);
-		static Reset oReset = nullptr;
-
-		typedef HRESULT(__stdcall* Present)(LPDIRECT3DDEVICE9 pDevice, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion);
-		static Present oPresent = nullptr;
-
-		//
-		static WNDPROC g_oldWndProc = nullptr;
-		static HWND g_hwnd = nullptr;
-
-		//
-		static bool g_menuInit = false;
-		static bool g_menuEnable = false;
-
-
-		LRESULT __stdcall ImGui_ImplDX9_WndProcHandler(HWND, UINT msg, WPARAM wParam, LPARAM lParam)
-		{
-			ImGuiIO& io = ImGui::GetIO();
-			switch (msg)
-			{
-			case WM_LBUTTONDOWN:
-				io.MouseDown[0] = true;
-				return true;
-			case WM_LBUTTONUP:
-				io.MouseDown[0] = false;
-				return true;
-			case WM_RBUTTONDOWN:
-				io.MouseDown[1] = true;
-				return true;
-			case WM_RBUTTONUP:
-				io.MouseDown[1] = false;
-				return true;
-			case WM_MBUTTONDOWN:
-				io.MouseDown[2] = true;
-				return true;
-			case WM_MBUTTONUP:
-				io.MouseDown[2] = false;
-				return true;
-			case WM_MOUSEWHEEL:
-				io.MouseWheel += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +1.0f : -1.0f;
-				return true;
-			case WM_MOUSEMOVE:
-				io.MousePos.x = (signed short)(lParam);
-				io.MousePos.y = (signed short)(lParam >> 16);
-				return true;
-			case WM_KEYDOWN:
-				if (wParam < 256)
-					io.KeysDown[wParam] = 1;
-				return true;
-			case WM_KEYUP:
-				if (wParam < 256)
-					io.KeysDown[wParam] = 0;
-				return true;
-			case WM_CHAR:
-				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-				if (wParam > 0 && wParam < 0x10000)
-					io.AddInputCharacter((unsigned short)wParam);
-				return true;
-			}
-			return 0;
-		}
-
-		long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
-		{
-			return oEndScene(pDevice);
-		}
-
-		long __stdcall hkReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresParam)
-		{
-			if (!g_menuEnable) {
-				return oReset(pDevice, pPresParam);
-			}
-
-			ImGui_ImplDX9_InvalidateDeviceObjects();
-
-			return oReset(pDevice, pPresParam);
-		}
-
-		HRESULT __stdcall hkPresent(LPDIRECT3DDEVICE9 pDevice, 
-			const RECT* pSourceRect, 
-			const RECT* pDestRect, 
-			HWND hDestWindowOverride, 
-			const RGNDATA* pDirtyRegion)
-		{
-
-			if (!g_menuInit) {
-				ImGui::CreateContext();
-				ImGui_ImplWin32_Init(g_hwnd);
-				ImGui_ImplDX9_Init(pDevice);
-				ImGui::StyleColorsDark();
-				ImGuiIO& io = ImGui::GetIO(); (void)io;
-				g_menuInit = true;
-			}
-
-			if (!g_menuEnable) {
-				return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-			}
-
-			static bool show_demo_window = true;
-			static bool show_another_window = false;
-			static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-
-
-			// Start the Dear ImGui frame
-			ImGui_ImplDX9_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-			// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-			if (show_demo_window)
-				ImGui::ShowDemoWindow(&show_demo_window);
-
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-			{
-				static float f = 0.0f;
-				static int counter = 0;
-
-				ImGui::Begin("Hello, world!",nullptr, ImGuiWindowFlags_AlwaysAutoResize);                          // Create a window called "Hello, world!" and append into it.
-
-				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-				ImGui::Checkbox("Another Window", &show_another_window);
-
-				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-				ImGui::ColorEdit3("clear color", (float*)& clear_color); // Edit 3 floats representing a color
-
-				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-					counter++;
-				ImGui::SameLine();
-				ImGui::Text("counter = %d", counter);
-
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-				ImGui::End();
-			}
-
-			// 3. Show another simple window.
-			if (show_another_window)
-			{
-				ImGui::Begin("Another Window", &show_another_window, ImGuiWindowFlags_AlwaysAutoResize);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-				ImGui::Text("Hello from another window!");
-				if (ImGui::Button("Close Me"))
-					show_another_window = false;
-				ImGui::End();
-			}
-
-			// Rendering
-			ImGui::EndFrame();
-			pDevice->SetRenderState(D3DRS_ZENABLE, false);
-			pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-			pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
-			if (pDevice->BeginScene() >= 0)
-			{
-				ImGui::Render();
-				ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-				pDevice->EndScene();
-			}
-			return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-		}
-
-		
-		LRESULT __stdcall Hooked_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
-			if (uMsg == WM_KEYUP && 
-				wParam == VK_INSERT) 
-			{
-				g_menuEnable = !g_menuEnable;
-			}
-
-			if (!g_menuEnable) {
-				return CallWindowProc(g_oldWndProc, hwnd, uMsg, wParam, lParam);
-			}
-
-			switch (uMsg)
-			{
-			case WM_LBUTTONDOWN:
-				ImGui::GetIO().MouseDown[0] = true; return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_LBUTTONUP:
-				ImGui::GetIO().MouseDown[0] = false; return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_RBUTTONDOWN:
-				ImGui::GetIO().MouseDown[1] = true; return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_RBUTTONUP:
-				ImGui::GetIO().MouseDown[1] = false; return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_MBUTTONDOWN:
-				ImGui::GetIO().MouseDown[2] = true; return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_MBUTTONUP:
-				ImGui::GetIO().MouseDown[2] = false; return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_MOUSEWHEEL:
-				ImGui::GetIO().MouseWheel += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +1.0f : -1.0f; return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_MOUSEMOVE:
-				ImGui::GetIO().MousePos.x = (signed short)(lParam); ImGui::GetIO().MousePos.y = (signed short)(lParam >> 16); return DefWindowProc(hwnd, uMsg, wParam, lParam);
-				break;
-			case WM_KEYUP:
-				// ImGui_ImplDX9_WndProcHandler(hwnd, uMsg, wParam, lParam);
-				break;
-			default:
-				break;
-			}
-
-			return CallWindowProc(g_oldWndProc, hwnd, uMsg, wParam, lParam);
-		}
-
-
-
-
-
-		void HookWindowProc() {
-
-			g_hwnd = FindWindow(L"GAME", nullptr);
-			assert(g_hwnd != 0);
-			if (g_hwnd == nullptr) {
-				return;
-			}
-			
-			g_oldWndProc= (WNDPROC)SetWindowLong(g_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(Hooked_WndProc));
-			assert(g_oldWndProc != 0);
-		}
-
-
-		void Hook(void*)
-		{
-			Sleep(5000);
-			HookWindowProc();
-
-			if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success) {
-
-				kiero::bind(16, (void**)& oReset, hkReset);
-				kiero::bind(17, (void**)& oPresent, hkPresent);
-
-				return;
-			}
-		}
-
-
-		void Start() {
-			
-			_beginthread(Hook, 0, 0);
-		}
-	}
-#endif // SHAIYA_WINDOW
 	namespace SkillCutting {
 
 		ShaiyaUtility::CMyInlineHook g_fully;
@@ -576,13 +318,273 @@ namespace Shaiya90
 		}
 	}
 
+
+	namespace ReadCharDecryption {
+
+		void __stdcall Decrypt(_In_ BYTE* Buf) {
+
+			if (Buf[2] < 10) {
+				return;
+			}
+
+			BYTE signature = Buf[2];
+			BYTE len = Buf[3];
+			for (BYTE i = 0; i < len; i++) {
+				Buf[i + 2] = Buf[i + 4] ^ signature;
+			}
+		}
+
+		ShaiyaUtility::CMyInlineHook g_obj;
+		__declspec(naked) void Naked()
+		{
+			_asm
+			{
+				mov eax, dword ptr ss : [esp + 0x8]
+				push eax
+				pushad
+				MYASMCALL_1(Decrypt, eax)
+				popad
+				jmp g_obj.m_pRet
+			}
+		}
+
+		void Start() {
+			g_obj.Hook(0x0059a187, Naked);
+		}
+	}
+
+
+
+	namespace antiHacker {
+
+		namespace AntiSpeedHacke {
+
+			DWORD Get_InternalEnumWindows_Addr()
+			{
+				PBYTE base = (PBYTE)GetProcAddress(GetModuleHandle(L"user32.dll"), "EnumWindows");
+				DWORD addr = 0;
+				while (TRUE)
+				{
+					if (*base == 0xe8) {
+						addr = DWORD(base + *PINT(base + 1) + 5);
+						break;
+					}
+					base++;
+				}
+				return addr;
+			}
+
+			bool IsHacked()
+			{
+
+				auto IsHook = [](PBYTE pfun)->bool {
+					if (pfun && *pfun == 0xe9)
+						return true;
+					return false;
+				};
+
+
+				HMODULE hKernel32 = GetModuleHandle(L"Kernel32.dll");
+				HMODULE hWinmmm = GetModuleHandle(L"Winmm.dll");
+				HMODULE hUser32 = GetModuleHandle(L"user32.dll");
+				HMODULE hNtdll = GetModuleHandle(L"ntdll.dll");
+				PBYTE pfunGetTickCount64 = NULL;
+				PBYTE pfunQueryPerformanceCounter = NULL;
+				PBYTE pfunGetTickCount = NULL;
+				PBYTE pfuntimeGetTime = NULL;
+				PBYTE pfunFindWindow = NULL;
+				PBYTE pDbgUiRemoteBreakin = NULL;
+
+				bool bRet = true;
+
+				if (hKernel32)
+				{
+					pfunGetTickCount64 = (PBYTE)GetProcAddress(hKernel32, "GetTickCount64");
+					pfunQueryPerformanceCounter = (PBYTE)GetProcAddress(hKernel32, "QueryPerformanceCounter");
+					pfunGetTickCount = (PBYTE)GetProcAddress(hKernel32, "GetTickCount");
+				}
+				if (hWinmmm)
+					pfuntimeGetTime = (PBYTE)GetProcAddress(hWinmmm, "timeGetTime");
+
+				if (hUser32)
+				{
+					pfunFindWindow = (PBYTE)GetProcAddress(hUser32, "FindWindowA");
+				}
+
+				if (hNtdll) {
+					pDbgUiRemoteBreakin = (PBYTE)GetProcAddress(hNtdll, "DbgUiRemoteBreakin");
+				}
+
+
+
+				DWORD InternalEnumWindows_addr = Get_InternalEnumWindows_Addr();
+
+				do
+				{
+					if ((bRet = IsHook(pfunGetTickCount)) == true) {
+						break;
+					}
+
+					if ((bRet = IsHook((BYTE*)0x0041d21c)) == true) {
+						break;
+					}
+
+					if ((bRet = IsHook(pfunGetTickCount64)) == true) {
+						break;
+					}
+
+					if ((bRet = IsHook(pfunQueryPerformanceCounter)) == true) {
+						break;
+					}
+
+					if ((bRet = IsHook(pfuntimeGetTime)) == true) {
+						break;
+					}
+
+					if ((bRet = IsHook(pfunFindWindow)) == true) {
+						break;
+					}
+
+					if ((bRet = IsHook(pDbgUiRemoteBreakin)) == true) {
+						break;
+					}
+
+					if ((bRet = IsHook((PBYTE)InternalEnumWindows_addr)) == true) {
+						break;
+					}
+
+				} while (0);
+
+				return bRet;
+			}
+		}
+
+		HRESULT DetectAndCloseHakcingProcHnd() {
+#ifndef _DEBUG
+			VMProtectBegin("DetectAndCloseHakcingProcHnd");
+#endif
+			static std::map<DWORD, DWORD> ignoredPids;
+			auto isIgnoredPid = [&](DWORD pid)->bool
+			{
+				if (pid == 4)
+					return true;
+				auto iter = ignoredPids.find(pid);
+				return iter != ignoredPids.end();
+			};
+
+			PSYSTEM_HANDLE_INFORMATION p;
+			RETURN_IF_FAILED(Utility::Native::ZwQuerySystemInformation_SysmHndInfo(&p));
+			auto cleanup = wil::scope_exit([&]() {delete p; });
+
+			for (DWORD i = 0; i < p->dwCount; i++) {
+
+				const auto& handle = p->Handles[i];
+
+				// not process type
+				if (handle.bObjectType != 7) {
+					continue;
+				}
+
+				// ignore current process
+				if (handle.dwProcessId == GetCurrentProcessId()) {
+					continue;
+				}
+
+				// must have write process memory
+				if (!(handle.GrantedAccess & PROCESS_VM_WRITE))
+				{
+					continue;
+				}
+
+				//
+				if (isIgnoredPid(handle.dwProcessId)) {
+					continue;
+				}
+
+				// get handle process id
+				HANDLE hObject = reinterpret_cast<HANDLE>(handle.wValue);
+
+				// try to open target process
+				wil::unique_process_handle proHnd(OpenProcess(
+					PROCESS_DUP_HANDLE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ
+					, 0, handle.dwProcessId));
+				if (!proHnd) {
+					ignoredPids.insert(std::pair<DWORD, DWORD>(handle.dwProcessId, GetTickCount()));
+					continue;
+				}
+
+				wil::unique_process_handle dupHnd;
+				if (!(DuplicateHandle(proHnd.get(),
+					hObject,
+					GetCurrentProcess(),
+					&dupHnd, 0, 0,
+					DUPLICATE_SAME_ATTRIBUTES | DUPLICATE_SAME_ACCESS)))
+				{
+					continue;
+				}
+
+				// check handle process id
+				if (GetProcessId(dupHnd.get()) != GetCurrentProcessId()) {
+					continue;
+				}
+
+				// get exe file path
+				WCHAR name[MAX_PATH]{};
+				if (!GetModuleFileNameEx(proHnd.get(), nullptr, name, MAX_PATH)) {
+					continue;
+				}
+
+				BOOLEAN trusted = FALSE;
+				if (FAILED(Utility::File::HasTrustedSignature(name, &trusted))) {
+					continue;
+				}
+				if (trusted) {
+					ignoredPids.insert(std::pair<DWORD, DWORD>(handle.dwProcessId, GetTickCount()));
+					continue;
+				}
+
+				dupHnd.release();
+				// now we try to close source handle
+				DuplicateHandle(proHnd.get(), hObject, GetCurrentProcess(), &dupHnd, 0,
+					FALSE, DUPLICATE_CLOSE_SOURCE);
+			}
+
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif		
+			RETURN_HR(S_OK);
+		}
+
+
+		void ThreadProc(_In_  LPVOID lpParameter) {
+#ifndef _DEBUG
+			VMProtectBegin("ThreadProc");
+#endif
+			while (true)
+			{
+				DetectAndCloseHakcingProcHnd();
+				if (AntiSpeedHacke::IsHacked()) {
+					Sleep(10 * 1000);
+					TerminateProcess(GetCurrentProcess(), 0);
+				}
+				Sleep(5000);
+			}
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif
+		}
+
+		void Start() {
+			_beginthread(ThreadProc, 0, 0);
+		}
+	}
+
 	void Start()
 	{
 		custompacket::Start();
 		ijl15Detection::Start();
-#ifdef SHAIYA_WINDOW
-		 GameWindow::Start();
-#endif
+		antiHacker::Start();
+		ReadCharDecryption::Start();
 	}
 
 }

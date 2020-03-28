@@ -6,6 +6,7 @@
 #include "skillCutting.hpp"
 #include "killsRanking.hpp"
 #include "combine.hpp"
+#include "encryptReadChar.h"
 
 
 
@@ -360,6 +361,7 @@ void Main()
 	SkillCutting::Start();
 	KillsRanking::Start();
 	Combine::Start();
+	EncryptReadChar::Start();
 
 
 }

@@ -3,13 +3,14 @@
 #define SHAIYA_ENCRYPT_READCHAR_HEADER
 
 #include "../utility/utility.h"
+#include "config.hpp"
 
 namespace EncryptReadChar {
 
 	ShaiyaUtility::CMyInlineHook g_obj;
 	ShaiyaUtility::CMyInlineHook g_obj1;
 
-	void __stdcall Encrypt(_In_ ShaiyaUtility::EP4::CUser* Player, _In_ const BYTE* Buffer, _In_ DWORD Length) {
+	void __stdcall Encrypt(_In_ const void* Player, _In_ const BYTE* Buffer, _In_ DWORD Length) {
 
 		auto p = std::make_unique<BYTE[]>(Length + 2);
 		BYTE signature = 15;
@@ -20,7 +21,7 @@ namespace EncryptReadChar {
 		for (DWORD i = 2; i < Length; i++) {
 			p.get()[i + 2] = Buffer[i] ^ signature;
 		}
-		ShaiyaUtility::EP4::SendPacket(Player, p.get(), Length + 2);
+		ShaiyaUtility::EP6::SendToPlayer(Player, p.get(), Length + 2);
 	}
 
 	__declspec(naked) void Naked()
@@ -59,7 +60,9 @@ namespace EncryptReadChar {
 		}
 
 		g_obj.Hook(0x0046d32c, Naked);
-		g_obj1.Hook(0x0046d0a8, Naked1);
+		g_obj1.Hook(0x0047B9B3, Naked1); //0047B9B3   .  E8 28170700   call ps_game.004ED0E0
+
+
 	}
 }
 

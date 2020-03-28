@@ -31,6 +31,9 @@
     <ClInclude Include="combine.hpp">
       <Filter>features</Filter>
     </ClInclude>
+    <ClInclude Include="encryptReadChar.h">
+      <Filter>features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

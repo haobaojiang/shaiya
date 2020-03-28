@@ -40,7 +40,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 		g_hModule = hModule;
+#ifndef _SHAIYA_90
 		Shaiya50::Start();
+#else
+		Shaiya90::Start();
+#endif
 		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:

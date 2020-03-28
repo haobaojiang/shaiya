@@ -355,3 +355,21 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+ClientFeature/Debug_Shaiya90/vc141.idb
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/CL.command.1.tlog
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/CL.read.1.tlog
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/CL.write.1.tlog
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/ClientFeature.lastbuildstate
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/ClientFeature.write.1u.tlog
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/link.command.1.tlog
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/link.delete.1.tlog
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/link.read.1.tlog
+ClientFeature/Debug_Shaiya90/ClientFeature.tlog/link.write.1.tlog
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/CL.command.1.tlog
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/CL.read.1.tlog
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/CL.write.1.tlog
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/ClientFeature.lastbuildstate
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/ClientFeature.write.1u.tlog
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/link.command.1.tlog
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/link.read.1.tlog
+ClientFeature/Release_Shaiya90/ClientFeature.tlog/link.write.1.tlog
