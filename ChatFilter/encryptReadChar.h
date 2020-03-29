@@ -59,7 +59,8 @@ namespace EncryptReadChar {
 			return;
 		}
 
-		g_obj.Hook(0x0046d32c, Naked);
+		g_obj.Hook(0x0047B50F, Naked); //0047B50F   .  E8 CC1B0700   call ps_game.004ED0E0
+
 		g_obj1.Hook(0x0047B9B3, Naked1); //0047B9B3   .  E8 28170700   call ps_game.004ED0E0
 
 
