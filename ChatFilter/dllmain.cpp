@@ -7,6 +7,7 @@
 #include "killsRanking.hpp"
 #include "combine.hpp"
 #include "encryptReadChar.h"
+#include "enhanceDelay.hpp"
 
 
 
@@ -362,7 +363,7 @@ void Main()
 	KillsRanking::Start();
 	Combine::Start();
 	EncryptReadChar::Start();
-
+	EnhanceDelay::start();
 
 }
 

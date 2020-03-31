@@ -103,6 +103,7 @@
     <ClInclude Include="combine.hpp" />
     <ClInclude Include="config.hpp" />
     <ClInclude Include="encryptReadChar.h" />
+    <ClInclude Include="enhanceDelay.hpp" />
     <ClInclude Include="hijack.h" />
     <ClInclude Include="killsRanking.hpp" />
     <ClInclude Include="namecolor.hpp" />

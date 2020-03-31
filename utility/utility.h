@@ -1026,6 +1026,10 @@ namespace ShaiyaUtility::EP6 {
 
 	static const int MAX_NOTICE_LENGTH = 0x69;
 
+	static DWORD PlayerUid(void* Player) {
+		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x582c);
+	}
+
 	static DWORD PlayerItemToItemId(DWORD ItemObject) {
 		auto ItemAddr = ShaiyaUtility::read<DWORD>(ItemObject + 0x30);
 		return ShaiyaUtility::read<DWORD>(ItemAddr);
@@ -1268,9 +1272,6 @@ namespace Utility {
 }
 
 namespace Utility::Image {
-
-
-
 
 	static HRESULT CaptureAnImage(_Out_ std::vector<UCHAR>* Output, HWND hWnd = nullptr)
 	{
