@@ -248,7 +248,9 @@ namespace Shaiya90
 				Combination::Process(P);
 				break;
 			}
-
+			case ShaiyaUtility::Packet::enhanceAttack: {
+				break;
+			}
 			default:
 				break;
 			}
@@ -318,7 +320,6 @@ namespace Shaiya90
 		}
 	}
 
-
 	namespace ReadCharDecryption {
 
 		void __stdcall Decrypt(_In_ BYTE* Buf) {
@@ -352,8 +353,6 @@ namespace Shaiya90
 			g_obj.Hook(0x0059a187, Naked);
 		}
 	}
-
-
 
 	namespace antiHacker {
 
@@ -579,12 +578,82 @@ namespace Shaiya90
 		}
 	}
 
+	namespace getEnhanceAttack {
+
+		ShaiyaUtility::CMyInlineHook g_obj;
+
+		DWORD g_data[21] = {
+			0  ,
+12 ,
+24 ,
+36 ,
+51 ,
+66 ,
+81 ,
+99 ,
+117,
+135,
+156,
+177,
+198,
+222,
+246,
+270,
+297,
+334,
+381,
+411,
+641,
+		};
+
+		void Process(void* P) {
+
+
+		}
+
+		DWORD __stdcall  ReadAttack(DWORD Index) {
+			if (Index > ARRAYSIZE(g_data)) {
+				return 0;
+			}
+			return g_data[Index];
+		}
+
+		__declspec(naked) void Naked()
+		{
+			_asm {
+				push ebx
+				push ecx
+				push edx
+				push ebp
+				push esp
+				push edi
+				push esi
+				MYASMCALL_1(ReadAttack,eax)
+				pop esi
+				pop edi
+				pop esp
+				pop ebp
+				pop edx
+				pop ecx
+				pop ebx
+				add esp, 0x4
+				jmp g_obj.m_pRet
+			}
+		}
+
+		void Start() {
+			//004A45E4 | .E8 77500200   call shaiya.004C9660
+			g_obj.Hook(reinterpret_cast<void*>(0x004A45E4), Naked, 5);
+		}
+	}
+
 	void Start()
 	{
 		custompacket::Start();
 		ijl15Detection::Start();
 		antiHacker::Start();
 		ReadCharDecryption::Start();
+		getEnhanceAttack::Start();
 	}
 
 }

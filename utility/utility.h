@@ -215,7 +215,8 @@ namespace ShaiyaUtility::Packet {
 		nameColor = begin,
 		skillCutting,
 		killsRanking,
-		itemCombines
+		itemCombines,
+		enhanceAttack,
 	};
 
 	enum { RandomColor = 0xffffffff };
@@ -224,6 +225,11 @@ namespace ShaiyaUtility::Packet {
 	struct Header {
 		Code command;
 		Header(Code cmd = Code::begin) :command(cmd) {}
+	};
+
+	// enhance attack
+	struct EnhanceAttack:Header {
+		BYTE count;
 	};
 
 	// notice
