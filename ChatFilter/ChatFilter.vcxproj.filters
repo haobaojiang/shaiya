@@ -37,6 +37,12 @@
     <ClInclude Include="enhanceDelay.hpp">
       <Filter>features</Filter>
     </ClInclude>
+    <ClInclude Include="instantMount.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="enhanceack.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

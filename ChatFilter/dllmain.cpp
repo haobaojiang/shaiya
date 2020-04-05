@@ -8,8 +8,8 @@
 #include "combine.hpp"
 #include "encryptReadChar.h"
 #include "enhanceDelay.hpp"
-
-
+#include "instantMount.hpp"
+#include "enhanceack.hpp"
 
 
 bool IsInjectAble() {
@@ -364,7 +364,8 @@ void Main()
 	Combine::Start();
 	EncryptReadChar::Start();
 	EnhanceDelay::start();
-
+	InstantMount::Start();
+	enhanceAck::Start();
 }
 
 BOOL APIENTRY DllMain(

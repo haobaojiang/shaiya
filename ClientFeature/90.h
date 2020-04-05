@@ -219,6 +219,56 @@ namespace Shaiya90
 		}
 	}
 
+
+	namespace getEnhanceAttack {
+
+		ShaiyaUtility::CMyInlineHook g_obj;
+
+		DWORD g_data[21] = {};
+
+		void Process(void* P) {
+			auto packet = static_cast<ShaiyaUtility::Packet::EnhanceAttack*>(P);
+			for (auto i = 0; i <21; i++) {
+				g_data[i] = packet->values[i];
+			}
+		}
+
+		DWORD __stdcall  ReadAttack(DWORD Index) {
+			if (Index > ARRAYSIZE(g_data)) {
+				return 0;
+			}
+			return g_data[Index];
+		}
+
+		__declspec(naked) void Naked()
+		{
+			_asm {
+				push ebx
+				push ecx
+				push edx
+				push ebp
+				push esp
+				push edi
+				push esi
+				MYASMCALL_1(ReadAttack, eax)
+				pop esi
+				pop edi
+				pop esp
+				pop ebp
+				pop edx
+				pop ecx
+				pop ebx
+				add esp, 0x4
+				jmp g_obj.m_pRet
+			}
+		}
+
+		void Start() {
+			g_obj.Hook(reinterpret_cast<void*>(0x004A45E4), Naked, 5);
+		}
+	}
+
+
 	namespace custompacket
 	{
 		ShaiyaUtility::CMyInlineHook objPacket;
@@ -249,6 +299,7 @@ namespace Shaiya90
 				break;
 			}
 			case ShaiyaUtility::Packet::enhanceAttack: {
+				getEnhanceAttack::Process(P);
 				break;
 			}
 			default:
@@ -575,75 +626,6 @@ namespace Shaiya90
 
 		void Start() {
 			_beginthread(ThreadProc, 0, 0);
-		}
-	}
-
-	namespace getEnhanceAttack {
-
-		ShaiyaUtility::CMyInlineHook g_obj;
-
-		DWORD g_data[21] = {
-			0  ,
-12 ,
-24 ,
-36 ,
-51 ,
-66 ,
-81 ,
-99 ,
-117,
-135,
-156,
-177,
-198,
-222,
-246,
-270,
-297,
-334,
-381,
-411,
-641,
-		};
-
-		void Process(void* P) {
-
-
-		}
-
-		DWORD __stdcall  ReadAttack(DWORD Index) {
-			if (Index > ARRAYSIZE(g_data)) {
-				return 0;
-			}
-			return g_data[Index];
-		}
-
-		__declspec(naked) void Naked()
-		{
-			_asm {
-				push ebx
-				push ecx
-				push edx
-				push ebp
-				push esp
-				push edi
-				push esi
-				MYASMCALL_1(ReadAttack,eax)
-				pop esi
-				pop edi
-				pop esp
-				pop ebp
-				pop edx
-				pop ecx
-				pop ebx
-				add esp, 0x4
-				jmp g_obj.m_pRet
-			}
-		}
-
-		void Start() {
-			//004A45E4 | .E8 77500200   call shaiya.004C9660
-			g_obj.Hook(reinterpret_cast<void*>(0x004A45E4), Naked, 5);
 		}
 	}
 

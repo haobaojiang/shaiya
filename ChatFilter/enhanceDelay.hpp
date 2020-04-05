@@ -78,6 +78,15 @@ namespace EnhanceDelay {
 
 		g_obj.Hook(0x0046CBC4, Naked, 6);//0046CBC4  |.  8BD9          mov ebx,ecx
 		g_obj2.Hook(0x0046CD97, Naked1, 5);//0046CD97  |.  FEC0          inc al
+
+		auto restoreOldDllDelay = [](void*)->void {
+			Sleep(5 * 1000);
+			BYTE data[] = {
+			0x81 ,0xEC ,0x18 ,0x0C,0x00 ,0x00
+			};
+			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x0046cba0, data, sizeof(data));
+		};
+		_beginthread(restoreOldDllDelay, 0, 0);
 	}
 }
 #endif

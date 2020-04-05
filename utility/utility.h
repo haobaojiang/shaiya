@@ -229,7 +229,8 @@ namespace ShaiyaUtility::Packet {
 
 	// enhance attack
 	struct EnhanceAttack:Header {
-		BYTE count;
+		DWORD values[21];
+		EnhanceAttack() :Header(Code::enhanceAttack) {}
 	};
 
 	// notice
@@ -1036,6 +1037,11 @@ namespace ShaiyaUtility::EP6 {
 		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x582c);
 	}
 
+	static void SetMounted(void* Player) {
+		return ShaiyaUtility::write<DWORD>(DWORD(Player) + 0x147c,2);
+	}
+
+
 	static DWORD PlayerItemToItemId(DWORD ItemObject) {
 		auto ItemAddr = ShaiyaUtility::read<DWORD>(ItemObject + 0x30);
 		return ShaiyaUtility::read<DWORD>(ItemAddr);
@@ -1048,6 +1054,7 @@ namespace ShaiyaUtility::EP6 {
 		auto offset = (Bag * 24 + Slot) * 4;
 		return  ShaiyaUtility::read<DWORD>((DWORD)Player + offset + 0x1c0);
 	}
+
 	static void SetItemCount(DWORD ItemObject, BYTE Count) {
 		ShaiyaUtility::write<BYTE>(ItemObject + 0x42, Count);
 	}
@@ -1265,6 +1272,11 @@ namespace ShaiyaUtility::EP6 {
 			mov eax, len
 			call callAddr
 		}
+	}
+
+	static void SendMounted(void* Player) {
+		BYTE packet[] = { 0x16,0x2,0x1,0x1 };
+		return SendToPlayer(Player, packet, sizeof(packet));
 	}
 
 }
