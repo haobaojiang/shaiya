@@ -224,11 +224,11 @@ namespace Shaiya90
 
 		ShaiyaUtility::CMyInlineHook g_obj;
 
-		DWORD g_data[21] = {};
+		DWORD g_data[51] = {};
 
 		void Process(void* P) {
 			auto packet = static_cast<ShaiyaUtility::Packet::EnhanceAttack*>(P);
-			for (auto i = 0; i <21; i++) {
+			for (auto i = 0; i <ARRAYSIZE(g_data); i++) {
 				g_data[i] = packet->values[i];
 			}
 		}

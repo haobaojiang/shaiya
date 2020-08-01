@@ -1,0 +1,6 @@
+
+
+namespace FFG {
+
+	void Start();
+}

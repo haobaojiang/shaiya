@@ -70,7 +70,9 @@ namespace Shaiya50
 
 			bool IsHacked()
 			{
-
+#ifndef _DEBUG
+				VMProtectBegin(__FUNCTION__);
+#endif
 				auto IsHook = [](PBYTE pfun)->bool {
 					if (pfun && *pfun == 0xe9)
 						return true;
@@ -123,6 +125,10 @@ namespace Shaiya50
 						break;
 					}
 
+					if ((bRet = IsHook((BYTE*)0x0041c41c)) == true) {
+						break;
+					}
+
 					if ((bRet = IsHook(pfunGetTickCount64)) == true) {
 						break;
 					}
@@ -149,6 +155,10 @@ namespace Shaiya50
 
 				} while (0);
 
+#ifndef _DEBUG
+				VMProtectEnd();
+#endif	
+
 				return bRet;
 			}
 		}
@@ -160,6 +170,9 @@ namespace Shaiya50
 				bool result = false;
 
 				auto callBack = [&](const WCHAR* ProcessFullPath) {
+#ifndef _DEBUG
+					VMProtectBegin(__FUNCTION__);
+#endif
 					LARGE_INTEGER fileSize{ 0 };
 					auto hr = Utility::File::GetFileSize(ProcessFullPath, &fileSize);
 					if (FAILED(hr)) {
@@ -167,7 +180,7 @@ namespace Shaiya50
 					}
 
 
-					if (fileSize.QuadPart != 2777088 && fileSize.QuadPart != 6946816) {
+					if (fileSize.QuadPart != 2777088 && fileSize.QuadPart != 6946816 && fileSize.QuadPart!= 33410048) {
 #ifdef _DEBUG
 						if (fileSize.QuadPart != 149784) {
 							return;
@@ -185,10 +198,13 @@ namespace Shaiya50
 					}
 
 					if (md5 == "256d3b76fbec283e1a00b5b33d872693" ||
-						md5 == "e46e7734abcbeba8fc24215a994510af") {
+						md5 == "e46e7734abcbeba8fc24215a994510af" ||
+						md5 =="4ddcd752d58e33697f376afde896d453") {
 						result = true;
 					}
-
+#ifndef _DEBUG
+					VMProtectEnd();
+#endif	
 				};
 
 				Utility::Process::EnumProcessFileFullPath(callBack);
@@ -198,7 +214,7 @@ namespace Shaiya50
 
 		HRESULT DetectAndCloseHakcingProcHnd() {		
 #ifndef _DEBUG
-			VMProtectBegin("DetectAndCloseHakcingProcHnd");
+			VMProtectBegin(__FUNCTION__);
 #endif
 			static std::map<DWORD, DWORD> ignoredPids;
 			auto isIgnoredPid = [&](DWORD pid)->bool
@@ -302,7 +318,7 @@ namespace Shaiya50
 				DetectAndCloseHakcingProcHnd();
 				if (AntiSpeedHacke::IsHacked() || Blacklist::IsHacked()) {
 					Sleep(10 * 1000);
-					TerminateProcess(GetCurrentProcess(), 0);
+					ExitProcess(0);
 				}
 				Sleep(5000);
 			}
@@ -320,15 +336,29 @@ namespace Shaiya50
 
 		void __stdcall Decrypt(_In_ BYTE* Buf) {
 
+#ifndef _DEBUG
+			VMProtectBegin(__FUNCTION__);
+#endif
 			if (Buf[2] < 10) {
 				return;
 			}
 
-			BYTE signature = Buf[2];
+			BYTE signature = Buf[2]+3;
 			BYTE len = Buf[3];
+
+			// xor buf
+			std::string encryptedStr;
 			for (BYTE i = 0; i < len; i++) {
-				Buf[i + 2] = Buf[i + 4] ^ signature;
+				encryptedStr.push_back(Buf[i+4] ^ signature);
 			}
+			// base64 buf
+			auto decryptedStr = Utility::base64_decode(encryptedStr.c_str());
+			memcpy(&Buf[2], decryptedStr.data(), decryptedStr.length());
+
+
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif
 		}
 
 		ShaiyaUtility::CMyInlineHook g_obj;

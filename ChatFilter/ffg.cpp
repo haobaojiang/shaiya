@@ -1,15 +1,11 @@
-
 #include "stdafx.h"
-#include "ffa.h"
+#include "ffg.h"
+#include <utility.h>
 
+namespace FFG {
 
+	using namespace ShaiyaUtility;
 
-
-
-
-
-namespace FFA
-{
 	CMyInlineHook obj_Attack;
 	CMyInlineHook g_objPartyMenu;
 	CMyInlineHook g_objPartyWords;
@@ -22,56 +18,48 @@ namespace FFA
 	CMyInlineHook g_objIsCommonSkillUsable;
 
 
+	WORD g_map = 45;
 
-
-	bool __stdcall isSameFaction(Pshaiya50_player Attacker, Pshaiya50_player Target)
+	bool __stdcall IsAttackAble(bool preAckable, void* Attacker, void* Target)
 	{
-		bool bRet =( Attacker->Country != Target->Country ? false : true);
-		for (auto iter = g_factionCallBack.begin(); iter != g_factionCallBack.end(); iter++) {
-			(*iter)(Attacker, Target, &bRet);
+		// 是否地图
+		if (EP6::PlayerMap(Attacker) != g_map) {
+			return preAckable;
 		}
-		return bRet;
-	}
-
-
-	void __stdcall addKills(Pshaiya50_player killer, Pshaiya50_player deather)
-	{
-		for (auto iter = g_addkillsCallBack.begin(); iter != g_addkillsCallBack.end(); iter++) {
-			(*iter)(killer, deather);
-		}
-	}
-
-
-
-
-
-	void __stdcall killLog(Pshaiya50_player killer, Pshaiya50_player deather)
-	{
-		for (auto iter = g_killedCallBack.begin(); iter != g_killedCallBack.end(); iter++) {
-			(*iter)(killer, deather);
-		}
+		// 判断行会
+		return EP6::PlayerGuide(Attacker) != EP6::PlayerGuide(Target);
 	}
 
 
 	//从b里面拿阵营
-	BYTE __stdcall GetFaction(Pshaiya50_player playerA, Pshaiya50_player playerB)
-	{
-		BYTE bRet=playerB->Country;
-		for (auto iter = g_getfactionCallBack.begin(); iter != g_getfactionCallBack.end(); iter++) {
-			(*iter)(playerA, playerB, &bRet);
+	BYTE __stdcall GetFaction(BYTE preCountry, void* playerA, void* playerB){
+
+		// 是否地图
+		if (EP6::PlayerMap(playerA) != g_map) {
+			return preCountry;
 		}
-		return bRet;
+		
+		//
+		bool isSameGuid = EP6::PlayerGuide(playerA) != EP6::PlayerGuide(playerB);
+		if (isSameGuid) {
+			return preCountry;
+		}
+
+		// 要知道B的阵营,拿A的反阵营出来
+		auto country = EP6::PlayerCountry(playerA);
+		if (country == 0) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+
 	}
 
 
-	bool __stdcall IsPartyAble(Pshaiya50_player srcPlayer, Pshaiya50_player dstPlayer)
+	bool __stdcall IsPartyAble(bool preValue, void* Attacker, void* Target)
 	{
-		bool bRet = (srcPlayer->Country == dstPlayer->Country);
-
-		for (auto iter = g_partyAbleCallBack.begin(); iter != g_partyAbleCallBack.end(); iter++) {
-			(*iter)(srcPlayer, dstPlayer, &bRet);
-		}
-		return bRet;
+		return !IsAttackAble(preValue, Attacker, Target);
 	}
 
 
@@ -79,74 +67,57 @@ namespace FFA
 	__declspec(naked) void  Naked_Attack()
 	{
 		_asm {
+			mov dl, byte ptr ds : [edx + 0x12D]
+			cmp dl, byte ptr ds : [eax + 0x12D]
+			jne _Org   //本身是不同阵营就没必要对比了
 			pushad
-			MYASMCALL_2(isSameFaction, eax, edx)
-			cmp al, 0x1             //把结果存放在zf标志位里先
+			MYASMCALL_2(IsAttackAble,0, eax, edx)
+			cmp al,0x1
 			popad
 			sete al
 			pop esi
 			retn
+
+			_Org: 
+			jmp obj_Attack.m_pRet
 		}
 	}
 
 
-	
 
-__declspec(naked) void  Naked_addKill()
-	{
-		_asm {
-			pushad
-			MYASMCALL_2(addKills, ecx, edx)
-			popad
-			sub esp,0x9c
-			jmp g_objAddkill.m_pRet
-		}
-	}
-
-	PVOID g_ShareKillsTempCall = (PVOID)0x0045b050;
-	__declspec(naked) void  Naked_killLog()
-	{
-		_asm {
-			pushad
-			MYASMCALL_2(killLog,ecx,edi)
-			popad
-			call g_ShareKillsTempCall
-			jmp g_objKill.m_pRet
-		}
-	}
 
 	DWORD partyWords_addr = 0x004678cd;
 	DWORD partyWords_SuccessAddr = 0x004678D6;
 	__declspec(naked) void  Naked_partyWords()
 	{
 		_asm {
-		pushad
-		MYASMCALL_2(IsPartyAble,ebp,edi)
-		cmp al,0x1
-		popad
-		je _org
-		jmp partyWords_addr
+			pushad
+			MYASMCALL_2(IsPartyAble, ebp, edi)
+			cmp al, 0x1
+			popad
+			je _org
+			jmp partyWords_addr
 
-		_org:
+			_org :
 			jmp partyWords_SuccessAddr
-		
+
 		}
 	}
-	
+
 	DWORD partyJoin_addr = 0x00467b91;
 	DWORD partyJoinSuccessAddr = 0x00467BA2;
 	__declspec(naked) void  Naked_PartyJoin()
 	{
 		_asm {
 			pushad
-			MYASMCALL_2(IsPartyAble,ebp,edi)
-			cmp al,0x1
+			MYASMCALL_2(IsPartyAble, ebp, edi)
+			cmp al, 0x1
 			popad
 			je _org
 			jmp partyJoin_addr
 
-			_org:
-				jmp partyJoinSuccessAddr
+			_org :
+			jmp partyJoinSuccessAddr
 
 		}
 	}
@@ -157,20 +128,20 @@ __declspec(naked) void  Naked_addKill()
 	{
 		_asm {
 			pushad
-			MYASMCALL_2(IsPartyAble,esi,ebp)
-			cmp al,0x1
+			MYASMCALL_2(IsPartyAble, esi, ebp)
+			cmp al, 0x1
 			popad
 			je __org
 			jmp partyMenu_addr
 
-			__org:
+			__org :
 			jmp partyMenu_SuccessAddr
 		}
 	}
 
 
 	bool __stdcall MoveAble(Pshaiya50_player playerA, Pshaiya50_player playerB) {
-		
+
 
 		//只要是2个人同一地图,那么必然允许
 		if (playerA->Map == playerB->Map) {
@@ -185,7 +156,7 @@ __declspec(naked) void  Naked_addKill()
 
 		bool bRet = true;
 		for (auto iter = g_moveCallBack.begin(); iter != g_moveCallBack.end(); iter++) {
-			(*iter)(playerA, playerB,&bRet);
+			(*iter)(playerA, playerB, &bRet);
 		}
 
 		return bRet;
@@ -209,8 +180,8 @@ __declspec(naked) void  Naked_addKill()
 		_asm
 		{
 			pushad
-			MYASMCALL_2(MoveAble,esi,ebp)
-			test al,al
+			MYASMCALL_2(MoveAble, esi, ebp)
+			test al, al
 			popad
 			jne __Org
 
@@ -239,7 +210,7 @@ __declspec(naked) void  Naked_addKill()
 			push esi
 			push edi
 
-MYASMCALL_2(GetFaction,esi,ebx)
+			MYASMCALL_2(GetFaction, esi, ebx)
 			movzx ecx, al
 
 			pop edi
@@ -260,8 +231,8 @@ MYASMCALL_2(GetFaction,esi,ebx)
 		_asm
 		{
 			pushad
-			MYASMCALL_2(MoveAble,esi,ebp)
-			test al,al
+			MYASMCALL_2(MoveAble, esi, ebp)
+			test al, al
 			popad
 			jne _Org
 			jmp dwfailSummon
@@ -291,12 +262,12 @@ MYASMCALL_2(GetFaction,esi,ebx)
 		}
 	}
 
-	bool __stdcall isCommonSkillUsable(Pshaiya50_player attack,Pshaiya50_player target) {
+	bool __stdcall isCommonSkillUsable(Pshaiya50_player attack, Pshaiya50_player target) {
 
 		bool bRet = (attack->Country == target->Country);
 
 		for (auto iter = g_commonSkillUsableCallBack.begin(); iter != g_commonSkillUsableCallBack.end(); iter++) {
-			(*iter)(attack,target,&bRet);
+			(*iter)(attack, target, &bRet);
 		}
 
 		return bRet;
@@ -308,14 +279,14 @@ MYASMCALL_2(GetFaction,esi,ebx)
 		_asm {
 			pushad
 			MYASMCALL_2(isCommonSkillUsable, esi, edx)
-			cmp al,0x1
+			cmp al, 0x1
 			popad
 			sete al
-			retn 
+			retn
 		}
 	}
 
-	
+
 
 
 
@@ -324,7 +295,8 @@ MYASMCALL_2(GetFaction,esi,ebx)
 	void Start()
 	{
 		//是否可攻击
-		obj_Attack.Hook((PVOID)0x0044be5b, Naked_Attack, 6);
+		// 0044BE61  |.  3A90 2D010000       cmp dl,byte ptr ds:[eax+0x12D]
+		obj_Attack.Hook((PVOID)0x0044BE61, Naked_Attack, 6);
 
 		//限制组队的
 		g_objPartyJoin.Hook((PVOID)0x00467b83, Naked_PartyJoin, 6);
@@ -334,7 +306,7 @@ MYASMCALL_2(GetFaction,esi,ebx)
 		//见到敌人的时候拿阵营
 		obj_ProcessFaction.Hook((PVOID)0x0041ff41, Naked_Faction, 7);
 
-		
+
 		//是否让用辅助技能
 		g_objIsCommonSkillUsable.Hook(PVOID(0x0044bf70), Naked_isCommonSkillUsable, 6);
 
@@ -342,9 +314,6 @@ MYASMCALL_2(GetFaction,esi,ebx)
 		g_objEnableKills.Hook((PVOID)0x004588c3, Naked_enablekills, 6);
 
 
-		g_objKill.Hook((PVOID)0x00458c78, Naked_killLog, 5);        //绝对人头的
-		g_objAddkill.Hook(PVOID(0x0045aed0), Naked_addKill, 6);
-		
 		//不是同一阵营不可移动
 		g_objMoveLimited.Hook(PVOID(0x00465eb4), Naked_MoveLimited, 5);
 
@@ -352,9 +321,5 @@ MYASMCALL_2(GetFaction,esi,ebx)
 		g_objSummonLimited.Hook(PVOID(0x0048db0a), Naked_summonLimited, 6);
 
 	}
+
 }
-
-
-
-
-

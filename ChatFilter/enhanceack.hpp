@@ -26,7 +26,7 @@ namespace enhanceAck {
 		if (reader->ParseError()) {
 			ExitProcess(0);
 		}
-		for (auto i = 0; i < 21; i++) {
+		for (auto i = 0; i < 51; i++) {
 			char key[50]{};
 			sprintf_s(key, 50, "WeaponStep%02d", i);
 			auto value = reader->GetInteger("LapisianEnchantAddValue", key, 0);
