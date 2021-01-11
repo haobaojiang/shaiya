@@ -43,6 +43,36 @@
     <ClInclude Include="enhanceack.hpp">
       <Filter>features</Filter>
     </ClInclude>
+    <ClInclude Include="randomRes.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="party_hook.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="customized_1.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="fireport.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="banneditem.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="get_players.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="ShareKills.h">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="customized_2.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="skill_tradechat.h">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="skill_auto_kill.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

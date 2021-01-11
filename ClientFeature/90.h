@@ -4,14 +4,124 @@
 #include "../utility/utility.h"
 #include "../utility/native.h"
 #include "../utility/file.h"
+#include "../utility/process.h"
 #include "kiero.h"
 #include <assert.h>
 #include <wil/resource.h>
 #include <map>
 #include "VMProtectSDK.h"
+#include <httplib.h>
 
 namespace Shaiya90
 {
+	namespace multipleClient
+	{
+
+
+		std::optional<std::wstring> get_process_name(DWORD processID)
+		{
+			// Get a handle to the process.
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+				PROCESS_VM_READ,
+				FALSE, processID);
+			if (hProcess == nullptr)
+			{
+				return std::nullopt;
+			}
+
+			// Get the process name.
+			wchar_t szProcessName[MAX_PATH]{};
+			GetProcessImageFileName(hProcess, szProcessName, MAX_PATH);
+			auto ret = PathFindFileName(szProcessName);
+			CloseHandle(hProcess);
+
+			return ret;
+		}
+
+		
+		std::optional<int> get_game_nums()
+		{
+			DWORD aProcesses[1024]{};
+			DWORD cbNeeded{ };
+			DWORD cProcesses{};
+			unsigned int i{};
+
+			if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
+			{
+				return std::nullopt;
+			}
+
+			auto count = 0;
+			cProcesses = cbNeeded / sizeof(DWORD);
+			for (i = 0; i < cProcesses; i++)
+			{
+				if (aProcesses[i] == 0)
+				{
+					continue;
+				}
+
+				auto name = get_process_name(aProcesses[i]);
+				if (!name)
+				{
+					continue;
+				}
+				if (wcsicmp(name->c_str(), L"Game.exe") == 0)
+				{
+					count++;
+				}
+			}
+
+			return count;
+		}
+
+		
+		int get_client_allowed_num()
+		{
+			char dir[MAX_PATH]{};
+			GetCurrentDirectoryA(MAX_PATH, dir);
+
+			std::string iniFile(dir);
+			iniFile.append("/ctserver.ini");
+
+			char ip[256]{};
+			GetPrivateProfileStringA("servershuangxian", "server1_ip", "127.0.217.58", ip, 256, iniFile.c_str());
+
+
+			char url[MAX_PATH]{};
+			sprintf_s(url, MAX_PATH, "http://%s:7088", ip);
+
+			httplib::Client cli(url);
+			auto res = cli.Get("/shaiya/allowed_open_clients.txt");
+			if (!res)
+			{
+				return 1;
+			}
+			return std::stoi(res->body);
+		}
+
+		void worker(void*)
+		{
+			auto allowed_clients = get_client_allowed_num();
+			auto cur_clients = get_game_nums();
+			if (!cur_clients)
+			{
+				return;
+			}
+
+			if (cur_clients.value() > allowed_clients)
+			{
+				ExitProcess(0);
+			}
+		}
+
+		void start()
+		{
+			_beginthread(worker, 0, 0);
+		}
+		
+	}
+
+	
 	namespace SkillCutting {
 
 		ShaiyaUtility::CMyInlineHook g_fully;
@@ -90,6 +200,7 @@ namespace Shaiya90
 
 			StartWorker();
 
+			memset(g_colors, 0, sizeof(g_colors));
 			for (DWORD i = 0; i < ARRAYSIZE(nameColorPacket->players); i++) {
 
 				auto charid = nameColorPacket->players[i].charid;
@@ -228,7 +339,7 @@ namespace Shaiya90
 
 		void Process(void* P) {
 			auto packet = static_cast<ShaiyaUtility::Packet::EnhanceAttack*>(P);
-			for (auto i = 0; i <ARRAYSIZE(g_data); i++) {
+			for (auto i = 0; i < ARRAYSIZE(g_data); i++) {
 				g_data[i] = packet->values[i];
 			}
 		}
@@ -509,7 +620,7 @@ namespace Shaiya90
 			}
 		}
 
-		HRESULT DetectAndCloseHakcingProcHnd() {
+		HRESULT tectAndCloseHakcingProcHnd() {
 #ifndef _DEBUG
 			VMProtectBegin("DetectAndCloseHakcingProcHnd");
 #endif
@@ -612,7 +723,7 @@ namespace Shaiya90
 #endif
 			while (true)
 			{
-				DetectAndCloseHakcingProcHnd();
+				tectAndCloseHakcingProcHnd();
 				if (AntiSpeedHacke::IsHacked()) {
 					Sleep(10 * 1000);
 					TerminateProcess(GetCurrentProcess(), 0);
@@ -629,13 +740,39 @@ namespace Shaiya90
 		}
 	}
 
+
+	void VerifyParentProcess()
+	{
+		DWORD parentPid = {};
+		auto hr = Utility::Process::GetCurProcessParentId(&parentPid);
+		if (FAILED(hr))
+		{
+			ExitProcess(0);
+		}
+
+		auto name = Utility::Process::GetProcessName(parentPid);
+		if (!name)
+		{
+			ExitProcess(0);
+		}
+
+		if (wcsicmp(name.value().c_str(), L"updater.exe") != 0)
+		{
+			ExitProcess(0);
+		}
+	}
+
+
 	void Start()
 	{
+//		VerifyParentProcess();
+		
 		custompacket::Start();
 		ijl15Detection::Start();
 		antiHacker::Start();
 		ReadCharDecryption::Start();
 		getEnhanceAttack::Start();
+	multipleClient::start();
 	}
 
 }

@@ -4,14 +4,17 @@
 
 #include "stdafx.h"
 #include "config.hpp"
+#include <mutex>
 
 
 namespace onLogin{
 
 
 	ShaiyaUtility::CMyInlineHook g_objToonselection;
-
 	std::vector<std::function<void(void*)>> g_onLoginCallBacks;
+
+
+
 
 	void __stdcall fun(void* player) {
 

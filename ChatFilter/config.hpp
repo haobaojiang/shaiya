@@ -7,15 +7,15 @@
 #include <INIReader.h>
 #pragma warning( pop )
 #include <windows.h>
-#include <mutex>
+
 
 
 namespace GameConfiguration {
 
 	INIReader* g_iniReader = nullptr;
 
-	
-	std::string Get(std::string section, std::string name,std::string default_value = "")  {
+
+	std::string Get(std::string section, std::string name, std::string default_value = "") {
 		return g_iniReader->Get(section, name, default_value);
 	}
 
@@ -72,12 +72,12 @@ namespace GameConfiguration {
 	}
 
 	BOOL Init() {
-		
-		static std::once_flag flag;
-		std::call_once(flag, []() {
-			g_iniReader = GenerateReader();
-			_beginthread(ReLoad, 0, 0);});
-		
+
+
+		g_iniReader = GenerateReader();
+		_beginthread(ReLoad, 0, 0);
+
+
 		return g_iniReader != nullptr;
 	}
 

@@ -23,7 +23,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -63,7 +63,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;TRADECHANNEL_EXPORTS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -99,18 +100,28 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="banneditem.hpp" />
     <ClInclude Include="callBack.hpp" />
     <ClInclude Include="combine.hpp" />
     <ClInclude Include="config.hpp" />
+    <ClInclude Include="customized_1.hpp" />
+    <ClInclude Include="customized_2.hpp" />
     <ClInclude Include="encryptReadChar.h" />
     <ClInclude Include="enhanceack.hpp" />
     <ClInclude Include="enhanceDelay.hpp" />
+    <ClInclude Include="fireport.hpp" />
+    <ClInclude Include="get_players.hpp" />
     <ClInclude Include="hijack.h" />
     <ClInclude Include="instantMount.hpp" />
     <ClInclude Include="killsRanking.hpp" />
     <ClInclude Include="namecolor.hpp" />
     <ClInclude Include="onLogin.hpp" />
+    <ClInclude Include="party_hook.hpp" />
+    <ClInclude Include="randomRes.h" />
+    <ClInclude Include="ShareKills.h" />
     <ClInclude Include="skillCutting.hpp" />
+    <ClInclude Include="skill_auto_kill.hpp" />
+    <ClInclude Include="skill_tradechat.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

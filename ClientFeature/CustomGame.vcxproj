@@ -80,25 +80,25 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\..\shaiya5</OutDir>
     <TargetName>ijl15</TargetName>
-    <IncludePath>D:\github\wil\include\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\github\wil\include\;D:\github\cpp-httplib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Shaiya90|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\..\shaiya9</OutDir>
     <TargetName>ijl15</TargetName>
-    <IncludePath>D:\github\wil\include\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\github\wil\include\;D:\github\cpp-httplib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>ijl15Org</TargetName>
     <OutDir>E:\code\shaiya-release</OutDir>
-    <IncludePath>D:\github\wil\include\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\github\wil\include\;D:\github\cpp-httplib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Shaiya90|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>ijl15_90.dll</TargetName>
     <OutDir>E:\code\shaiya-release</OutDir>
-    <IncludePath>D:\github\wil\include\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\github\wil\include\;D:\github\cpp-httplib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

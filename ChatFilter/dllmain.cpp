@@ -10,7 +10,14 @@
 #include "enhanceDelay.hpp"
 #include "instantMount.hpp"
 #include "enhanceack.hpp"
-
+#include "randomRes.h"
+#include "party_hook.hpp"
+#include "fireport.hpp"
+#include "customized_1.hpp"
+#include "banneditem.hpp"
+#include "get_players.hpp"
+#include "ShareKills.h"
+#include "customized_2.hpp"
 
 bool IsInjectAble() {
 
@@ -358,6 +365,7 @@ void Main()
 
 	LOGD << "after InitGame";
 
+	getPlayer::Start();
 	NameColor::Start();
 	SkillCutting::Start();
 	KillsRanking::Start();
@@ -366,6 +374,16 @@ void Main()
 	EnhanceDelay::start();
 	InstantMount::Start();
 	enhanceAck::Start();
+	randomRes::Start();
+	part_hook::start();
+	fire_port::start();
+	customized_1::start();
+	banned_item::start();
+	StartShareKill();
+
+
+	Customized2::start(NameColor::applyPlayerColor,NameColor::removePlayerColor);
+	
 }
 
 BOOL APIENTRY DllMain(

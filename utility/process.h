@@ -15,6 +15,7 @@
 #include <Wbemidl.h>
 #include <iostream>
 #include <vector>
+#include <optional>
 #include "file.h"
 
 #pragma comment(lib,"shlwapi.lib")
@@ -223,5 +224,52 @@ namespace Utility::Process {
 
 		return hr;
 	}
+
+    static HRESULT GetCurProcessParentId(_Inout_ DWORD* Output)
+	{
+		
+		wil::unique_handle snapshot(::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0));
+		RETURN_LAST_ERROR_IF(!snapshot);
+
+		PROCESSENTRY32 procentry{};
+		procentry.dwSize = sizeof(PROCESSENTRY32);
+		RETURN_IF_WIN32_BOOL_FALSE(Process32First(snapshot.get(), &procentry));
+		
+		DWORD pid = 0;
+		
+		// While there are processes, keep looping.
+		DWORD  crtpid = GetCurrentProcessId();
+		while (true)
+		{
+			if (crtpid == procentry.th32ProcessID)
+			{
+				*Output = procentry.th32ParentProcessID;
+				RETURN_HR(S_OK);
+			}
+			procentry.dwSize = sizeof(PROCESSENTRY32);
+			RETURN_IF_WIN32_BOOL_FALSE(Process32Next(snapshot.get(), &procentry));
+		}
+	}
+
+	std::optional<std::wstring> GetProcessName(DWORD processID)
+	{
+		// Get a handle to the process.
+		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+			PROCESS_VM_READ,
+			FALSE, processID);
+		if (hProcess == nullptr)
+		{
+			return std::nullopt;
+		}
+
+		// Get the process name.
+		wchar_t szProcessName[MAX_PATH]{};
+		GetProcessImageFileName(hProcess, szProcessName, MAX_PATH);
+		auto ret = PathFindFileName(szProcessName);
+		CloseHandle(hProcess);
+
+		return ret;
+	}
+	
 }
 #endif

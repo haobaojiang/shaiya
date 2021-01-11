@@ -68,6 +68,11 @@ namespace ShaiyaUtility {
 		return tokens;
 	}
 
+	struct Pos {
+		float x;
+		float y;
+		float z;
+	};
 
 
 	static std::string itos(int i) {
@@ -1039,9 +1044,42 @@ namespace ShaiyaUtility::EP6 {
 		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x582c);
 	}
 
+	static DWORD GetPlayerKills(void* Player)
+	{
+		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x148);
+	}
+
+	static bool IsPlayerConnected(void* Player)
+	{
+		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0xd8)>0;
+	}
+
+	static bool IsLegalPlayer(void* Player)
+	{
+		if(!IsPlayerConnected(Player))
+		{
+			return false;
+		}
+
+		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0xe0) > 0;
+	}
+
+	static DWORD PlayerCharid(void* Player)
+	{
+		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x128);
+	}
+
+
+
+
 	static BYTE PlayerCountry(void* Player) {
 		return ShaiyaUtility::read<BYTE>(DWORD(Player) + 0x12d);
 	}
+
+	static DWORD PlayerParty(void* Player) {
+		return ShaiyaUtility::read<BYTE>(DWORD(Player) + 0x17f4);
+	}
+
 
 	static DWORD PlayerGuide(void* Player) {
 		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x1810);
@@ -1063,9 +1101,116 @@ namespace ShaiyaUtility::EP6 {
 		return ShaiyaUtility::read<BYTE>(ItemObject + 0x42);
 	}
 
+	static BYTE GetPlayerFamily(const void* Player) {
+		return ShaiyaUtility::read<BYTE>(DWORD(Player) + 0x12e);
+	}
+	static BYTE GetPlayerJob(const void* Player) {
+		return ShaiyaUtility::read<BYTE>(DWORD(Player) + 0x134);
+	}
+
 	static DWORD GetInventoryItem(const void* Player, DWORD Bag, DWORD Slot) {
 		auto offset = (Bag * 24 + Slot) * 4;
 		return  ShaiyaUtility::read<DWORD>((DWORD)Player + offset + 0x1c0);
+	}
+
+	static DWORD ItemObjToItemid(DWORD ItemObj) {
+		return ShaiyaUtility::read<DWORD>(ItemObj);
+	}
+
+	static DWORD GetPlayerSkillNTotal(const void* Player) {
+		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0xabc);
+	}
+
+
+	static DWORD GetPlayerSkillObj(const void* Player, DWORD SkillSlotIdx) {
+		auto ret = ShaiyaUtility::read<DWORD>(DWORD(Player) + 0xac0 + SkillSlotIdx * 4);
+		return ret;
+
+	}
+
+	static DWORD GetSkillObjUid(DWORD SkillObj) {
+		return ShaiyaUtility::read<DWORD>(SkillObj + 0x8);
+	}
+
+	static DWORD GetSkillInfo(DWORD SkillObj) {
+		return ShaiyaUtility::read<DWORD>(SkillObj + 0x34);
+	}
+
+	static bool CheckSkillUsableForJob(DWORD SkillInfo,DWORD Job) {
+		return ShaiyaUtility::read<BYTE>(SkillInfo + 0x27 + Job);
+	}
+
+	static WORD GetSkillId(DWORD SkillInfo)
+	{
+		return ShaiyaUtility::read<WORD>(SkillInfo);
+	}
+
+	static void SetPlayerStatus(void* player,int value){
+		ShaiyaUtility::write<int>(reinterpret_cast<DWORD>(player) + 0x5808,value);
+	}
+
+	static int GetPlayerStatus(void* player) {
+		return ShaiyaUtility::read<int>(reinterpret_cast<DWORD>(player) + 0x5808);
+	}
+
+	static bool SendGmCommand(void* player,void* packet) {
+
+		auto oldStatus = GetPlayerStatus(player);
+		SetPlayerStatus(player, 1);
+
+		// gm cmd call
+		DWORD dwCall = 0x00483430;
+		_asm {
+			push player
+			mov ecx, packet
+			call  dwCall
+		}
+		SetPlayerStatus(player, oldStatus);
+	}
+
+	static void MovePlayer(void* p,WORD m,float x,float y,float z) {
+
+
+
+		
+#pragma pack(push,1)
+		struct Packet {
+			WORD cmd = 0xfa0a;
+			float x{};
+			float z{};
+			WORD m{};
+		};
+#pragma pack(pop)
+
+		Packet packet;
+		packet.x = x;
+		packet.z = z;
+		packet.m = m;
+
+		SendGmCommand(p, &packet);
+	}
+
+	static void KickPlayer(void* p)
+	{
+		DWORD dwCall = 0x004EC760;
+		_asm{
+			push 0x0
+			push 0x9
+			mov ecx,p
+			call dwCall
+		}
+	}
+
+	
+	static void RemoveSkill(const void* Player,DWORD SkillUid) {
+
+		DWORD dwCall = 0x00493EF0;
+
+		_asm {
+			push SkillUid
+			mov ecx,Player
+			call dwCall
+		}
 	}
 
 	static void SetItemCount(DWORD ItemObject, BYTE Count) {
@@ -1290,6 +1435,48 @@ namespace ShaiyaUtility::EP6 {
 	static void SendMounted(void* Player) {
 		BYTE packet[] = { 0x16,0x2,0x1,0x1 };
 		return SendToPlayer(Player, packet, sizeof(packet));
+	}
+
+
+	static DWORD AddPlayerKills(void* Player, DWORD Kills)
+	{
+		auto old = ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x148);
+		auto newKills = old + Kills;
+
+		ShaiyaUtility::write(DWORD(Player) + 0x148, newKills);
+
+#pragma pack(push)
+#pragma pack(1)
+		struct updateKillPacket
+		{
+			WORD header = 0x60c;
+			DWORD uid{};
+			BYTE unk{};
+			DWORD kills{};
+		};
+		// inform player
+		struct updateClientKill
+		{
+			WORD header = 0xf701;
+			BYTE Type = 0x11;
+			DWORD kills{};
+		};
+#pragma pack(pop)
+
+		updateKillPacket packet;
+		packet.kills = newKills;
+		packet.uid = PlayerUid(Player);
+		void* p = &packet;
+		DWORD dwCall = 0x004ED2D0;
+		_asm {
+			push 0xb
+			push p
+			mov ecx, dword ptr ds : [0x58796C]
+			call dwCall
+		}
+		updateClientKill clientPacket;
+		clientPacket.kills = newKills;
+		ShaiyaUtility::EP6::SendToPlayer(Player, &clientPacket, sizeof(updateClientKill));
 	}
 
 }
@@ -1694,6 +1881,9 @@ namespace Utility::WMI {
 
 		return hr;
 	}
+
+
+	
 
 
 }
