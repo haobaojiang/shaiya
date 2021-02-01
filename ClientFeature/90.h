@@ -1,6 +1,5 @@
 
 #include <windows.h>
-#include <mutex>
 #include "../utility/utility.h"
 #include "../utility/native.h"
 #include "../utility/file.h"
@@ -152,10 +151,14 @@ namespace Shaiya90
 		}
 
 		void FullySkillCutting() {
-			static std::once_flag flag;
-			std::call_once(flag, []() {
-				g_fully.Hook(reinterpret_cast<void*>(0x0043d62f), Naked_fully, 6);
-				});
+			static bool  flag = false;
+			if(flag)
+			{
+				return;
+			}
+			g_fully.Hook(reinterpret_cast<void*>(0x0043d62f), Naked_fully, 6);
+			flag = true;
+				
 		}
 
 		void ProcessPacket(PVOID Packet) {
@@ -270,12 +273,16 @@ namespace Shaiya90
 
 		void StartWorker() {
 
-			static std::once_flag flag;
-			std::call_once(flag, []() {
+			static bool flag = false;
+			if(flag)
+			{
+				return ;
+			}
+			flag = true;
 				objNormal.Hook((PVOID)0x0044b5c6, Naked_Normal, 11);
 				ObjParty.Hook((PVOID)0x0044b664, Naked_Party, 8);
 				_beginthread(GenerateRandomColor, 0, nullptr);
-				});
+			
 		}
 	}
 
@@ -285,8 +292,13 @@ namespace Shaiya90
 
 			auto packet = reinterpret_cast<ShaiyaUtility::Packet::KillsRankingContent*>(p);
 
-			static std::once_flag flag;
-			std::call_once(flag, [&]() {
+			static bool flag = false;
+			if(flag)
+			{
+				return;
+			}
+			flag = true;
+		
 				ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708298),
 					packet->killsNeeded,
 					sizeof(packet->killsNeeded));
@@ -303,7 +315,7 @@ namespace Shaiya90
 				ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708218),
 					packet->ultimateModePoints,
 					sizeof(packet->ultimateModePoints));
-				});
+				
 		}
 
 	}

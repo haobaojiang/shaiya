@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <mutex>
 #include <wil/result.h>
 #include <wil/resource.h>
 #include "../utility/utility.h"

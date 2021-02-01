@@ -27,6 +27,9 @@
     <Filter Include="源文件\5.0">
       <UniqueIdentifier>{17e61b22-8a85-4462-9976-252388c19a7b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\13.0">
+      <UniqueIdentifier>{267fc041-33c9-4103-b386-b049ba544389}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -43,6 +46,9 @@
     </ClInclude>
     <ClInclude Include="50.h">
       <Filter>源文件\5.0</Filter>
+    </ClInclude>
+    <ClInclude Include="13.h">
+      <Filter>源文件\13.0</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

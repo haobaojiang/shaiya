@@ -182,6 +182,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="13.h" />
     <ClInclude Include="50.h" />
     <ClInclude Include="90.h" />
     <ClInclude Include="stdafx.h" />
