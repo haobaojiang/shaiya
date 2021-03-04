@@ -10,6 +10,7 @@
 #include <plog/Converters/NativeEOLConverter.h>
 #include <process.h>
 #include <functional>
+#include <array>
 
 /*
 #pragma once

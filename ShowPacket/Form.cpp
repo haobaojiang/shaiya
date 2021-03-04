@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <vector>
 #include <string>
-#include <MyPython.h>
+
 
 
 #pragma comment(lib,"user32.lib")
@@ -40,7 +40,7 @@ extern CRITICAL_SECTION g_cs;
 char Account[32] = "";
 
 
-MyPython* g_objPy = new MyPython("MyPacket");
+
 
 void SendPacket(char *buf, int len);
 void RecvPacket(char *buf, DWORD len);
@@ -62,8 +62,6 @@ BOOL CALLBACK Dlgproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
 			{
-
-
 				case IDC_BUTTON5:
 					ShowWindow(hWnd, SW_HIDE);
 					IsDialogVisible = false;
@@ -112,11 +110,8 @@ BOOL CALLBACK Dlgproc2(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					break;
 
 				case IDC_Exclude:
-					AddExIncludePacket(GetDlgItem(hWnd, IDC_LIST1));
+					//AddExIncludePacket(GetDlgItem(hWnd, IDC_LIST1));
 					break;
-
-
-
 			}
 	}
 	return FALSE;
@@ -167,21 +162,8 @@ void DisplayPacket(char *direction, char *buf, int len)
 	strcpy_s(Packet, 10000, direction);                                                 //头部插入send or recv
 	CreatePacketString((BYTE *)buf, len, Packet);                                       //然后组合成字符串
 
-	bool isIgnore = false;
-	try
-	{
-		g_objPy->lock();
-		isIgnore = boost::python::call_method<bool>(g_objPy->m_module->get(), "packet_arrived", (const char*)Packet);
-		g_objPy->Unlock();
-	}
-	catch (...)
-	{
-		g_objPy->Unlock();
-	}
-
-
-	if (!isIgnore)
-		SendMessage(GetDlgItem(FormHandle2, IDC_LIST1), LB_ADDSTRING, NULL, (LPARAM)Packet);//把字符串发送到窗体上
+	
+	SendMessage(GetDlgItem(FormHandle2, IDC_LIST1), LB_ADDSTRING, NULL, (LPARAM)Packet);//把字符串发送到窗体上
 	delete[] Packet;
 }
 
@@ -304,36 +286,6 @@ void SelectedPacketsToClipboard(HWND ListBox)
 	delete Packet;
 }
 
-void AddExIncludePacket(HWND ListBox)
-{
-	char *Packet = new char[1000000];
-	Packet[0] = '\0';
-	DWORD Count = SendMessage(ListBox, LB_GETCOUNT, 0, 0);
-	if ((Count != 0) && (Count != LB_ERR))
-	{
-		for (DWORD i = 0; i < Count; i++)
-		{
-			if (SendMessage(ListBox, LB_GETSEL, i, 0) > 0)
-			{
-				ZeroMemory(Packet, 1000000);
-				SendMessage(ListBox, LB_GETTEXT, i, (LPARAM)Packet);
-
-				//交给python进行逻辑处理
-				try
-				{
-					g_objPy->lock();
-					 boost::python::call_method<void>(g_objPy->m_module->get(), "AddExInclude", (const char*)Packet);
-					g_objPy->Unlock();
-				}
-				catch (...)
-				{
-					g_objPy->Unlock();
-				}
-			}
-		}
-	}
-	delete[] Packet;
-}
 
 void AllPacketsToClipboard(HWND ListBox)
 {

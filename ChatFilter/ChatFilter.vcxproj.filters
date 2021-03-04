@@ -73,6 +73,12 @@
     <ClInclude Include="skill_auto_kill.hpp">
       <Filter>features</Filter>
     </ClInclude>
+    <ClInclude Include="itemmap.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="linking.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

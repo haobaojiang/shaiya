@@ -70,6 +70,14 @@ struct GlobalHookAddr
 	DWORD HideCostume;
 	DWORD CharCommand;
 	DWORD SkillCut;
+	DWORD SkillIconAddr1;
+	DWORD SkillIconAddr2;
+	DWORD SkillIconAddr3;
+	DWORD SkillIconAddr4;
+	DWORD SkillIconAddr5;
+	DWORD SkillIconAddr6;
+	DWORD HideCostume1;
+	DWORD HideCostume2;
 };
 
 
@@ -86,6 +94,14 @@ bool InitHookAddr()
 	g_hook_addr.HideCostume = 0x006022C4;
 	g_hook_addr.CharCommand = 0x004e07c2;
 	g_hook_addr.SkillCut = 4563552;
+	g_hook_addr.SkillIconAddr1 = 0x221cec0;
+	g_hook_addr.SkillIconAddr2 = 0x221cec4;
+	g_hook_addr.SkillIconAddr3 = 0x221ceb8;
+	g_hook_addr.SkillIconAddr4 = 0x221cebc;
+	g_hook_addr.SkillIconAddr5 = 0x0221CEB0;
+	g_hook_addr.SkillIconAddr6 = 0x0221CEAC;
+	g_hook_addr.HideCostume1 = 0x00656209;
+	g_hook_addr.HideCostume2 = 0x0060484a;
 #endif
 	auto resp = HttpGet("/shaiya/skillcut_addr.txt");
 	if(!resp)
@@ -93,13 +109,22 @@ bool InitHookAddr()
 		return false;
 	}
 	
-	sscanf(resp.value().c_str(), "%x,%x,%x,%x,%x,%x",
+	sscanf(resp.value().c_str(), 
+		"%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x",
 		&g_hook_addr.HidePet,
 		&g_hook_addr.HideWing,
 		&g_hook_addr.HideEffect,
 		&g_hook_addr.HideCostume,
 		&g_hook_addr.CharCommand,
-		&g_hook_addr.SkillCut);
+		&g_hook_addr.SkillCut,
+		&g_hook_addr.SkillIconAddr1,
+		&g_hook_addr.SkillIconAddr2,
+		&g_hook_addr.SkillIconAddr3, 
+		&g_hook_addr.SkillIconAddr4, 
+		&g_hook_addr.SkillIconAddr5, 
+		&g_hook_addr.SkillIconAddr6,
+		&g_hook_addr.HideCostume1,
+		&g_hook_addr.HideCostume2);
 
 	return true;
 }
@@ -107,7 +132,7 @@ bool InitHookAddr()
 
 namespace HideEffect
 {
-	ShaiyaUtility::CMyInlineHook objPet, objWing, objEffect, objCostume;
+	ShaiyaUtility::CMyInlineHook objPet, objWing, objEffect, objCostume1, objCostume2;
 
 
 	bool g_IsShowPet = true;
@@ -118,7 +143,8 @@ namespace HideEffect
 	DWORD ignorePet = 0x00603E6B;
 	DWORD ignoreWing = 0x0060B76D;
 	DWORD ignoreEffect = 0x0060A101;
-	DWORD ignoreCostume = 0x0060232F;
+	DWORD ignoreCostume = 0x00656210;
+	DWORD ignoreCostume2 = 0x0060487E;
 
 	__declspec(naked) void Naked_HidePet()
 	{
@@ -169,19 +195,50 @@ namespace HideEffect
 		}
 	}
 
-	__declspec(naked) void Naked_costume()
+	__declspec(naked) void Naked_costume_1()
 	{
 		_asm
 		{
-			lea ecx, g_IsShowEffect
-			cmp byte ptr [ecx],0x0
+			// check switch
+			lea eax, g_IsShowCostume
+			cmp byte ptr [eax],0x0
 			jne __orginal
+
+			// check item type
+			lea eax, dword ptr [esp + 04]
+			cmp byte ptr[eax + 0x7], 0x96
+			jne __orginal
+			
+			
 			jmp ignoreCostume
 
 			__orginal:
-			mov ecx, dword ptr ds : [eax + 8]
-				movzx edx, word ptr ds : [ecx]
-			jmp objCostume.m_pRet
+			lea eax, [esp + 04]
+			push eax
+			jmp objCostume1.m_pRet
+		}
+	}
+
+	__declspec(naked) void Naked_costume_2()
+	{
+		_asm
+		{
+
+			// check switch
+			lea eax, g_IsShowCostume
+			cmp byte ptr[eax], 0x0
+			jne __orginal
+
+			//
+			movzx eax, byte ptr[esi + 0000023B]
+			cmp eax, 0x96
+			jne __orginal
+
+			jmp ignoreCostume2
+
+			__orginal :
+			movzx eax, byte ptr[esi + 0000023B]
+				jmp objCostume.m_pRet
 		}
 	}
 	
@@ -190,7 +247,8 @@ namespace HideEffect
 		objPet.Hook(g_hook_addr.HidePet, Naked_HidePet, 5);
 		objWing.Hook(g_hook_addr.HideWing, Naked_HideWing, 6);
 		objEffect.Hook(g_hook_addr.HideEffect, Naked_effect, 5);
-		objCostume.Hook(g_hook_addr.HideCostume, Naked_costume, 6);
+		objCostume1.Hook(g_hook_addr.HideCostume1, Naked_costume_1, 5);
+		objCostume1.Hook(g_hook_addr.HideCostume2, Naked_costume_2, 7);
 	}
 }
 
@@ -259,8 +317,32 @@ namespace ChatCommand
 
 		}
 	}
+
+
+	void write_config()
+	{
+		auto section = L"section";
+		auto fileName = L"shaiya_config.ini";
+		HideEffect::g_IsShowCostume = GetPrivateProfileInt(L"show_costume", L"enable", 1, fileName);
+		HideEffect::g_IsShowEffect = GetPrivateProfileInt(L"show_effect", L"enable", 1, fileName);
+		HideEffect::g_IsShowPet = GetPrivateProfileInt(L"show_pet", L"enable", 1, fileName);
+		HideEffect::g_IsShowWing = GetPrivateProfileInt(L"show_wing", L"enable", 1, fileName);
+	}
+	
+	void load_config()
+	{
+		auto section = L"section";
+		auto fileName = L"shaiya_config.ini";
+		HideEffect::g_IsShowCostume =  GetPrivateProfileInt(L"show_costume", L"enable", 1, fileName);
+		HideEffect::g_IsShowEffect =  GetPrivateProfileInt(L"show_effect", L"enable", 1, fileName);
+		HideEffect::g_IsShowPet =  GetPrivateProfileInt(L"show_pet", L"enable", 1, fileName);
+		HideEffect::g_IsShowWing =  GetPrivateProfileInt(L"show_wing", L"enable", 1, fileName);
+	}
+	
 	void Start()
 	{
+
+		
 		g_obj1.Hook(g_hook_addr.CharCommand, Naked_1,5);
 	}
 }
@@ -293,16 +375,51 @@ namespace SkillCutting {
 	}
 }
 
+
+namespace SkillIconFix
+{
+
+	void fix_skill_icon(void*)
+	{
+		while (true)
+		{
+			ShaiyaUtility::write<DWORD>(g_hook_addr.SkillIconAddr1, 15);
+			ShaiyaUtility::write<DWORD>(g_hook_addr.SkillIconAddr2, 19);
+			ShaiyaUtility::write<DWORD>(g_hook_addr.SkillIconAddr3, 20);
+			ShaiyaUtility::write<DWORD>(g_hook_addr.SkillIconAddr4, 24);
+			ShaiyaUtility::write<DWORD>(g_hook_addr.SkillIconAddr5, 20);
+			ShaiyaUtility::write<DWORD>(g_hook_addr.SkillIconAddr6, 9);
+			Sleep(10 * 1000);
+		}
+	}
+	
+	void start()
+	{
+		_beginthread(fix_skill_icon, 0, 0);
+	}
+}
+
+namespace MoveRuneFix
+{
+	void start()
+	{
+		BYTE data[2] = { 0x90 ,0x90 };
+		ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x0045A7FC), data, 2);
+	}
+}
+
 void start(void*)
 {
 	if(!InitHookAddr())
 	{
 		return;
 	}
-	Sleep(20 * 1000);
+	Sleep(10 * 1000);
 	SkillCutting::start();
 	ChatCommand::Start();
 	HideEffect::Start();
+	SkillIconFix::start();
+	MoveRuneFix::start();
 }
 
 

@@ -18,6 +18,8 @@
 #include "get_players.hpp"
 #include "ShareKills.h"
 #include "customized_2.hpp"
+#include "itemmap.hpp"
+#include "linking.hpp"
 
 bool IsInjectAble() {
 
@@ -380,10 +382,9 @@ void Main()
 	customized_1::start();
 	banned_item::start();
 	StartShareKill();
-
-
 	Customized2::start(NameColor::applyPlayerColor,NameColor::removePlayerColor);
-	
+	itemForMap::start();
+	linking::start();
 }
 
 BOOL APIENTRY DllMain(

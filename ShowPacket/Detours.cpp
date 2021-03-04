@@ -1,8 +1,9 @@
 
 #include "stdafx.h"
 #include "Detours.h"
-#include <MyInlineHook.h>
 #include <stdio.h>
+
+#include "../utility/utility.h"
 DWORD dwReTurnAdd = 0;
 
 DWORD Address = 0;         
@@ -102,7 +103,7 @@ void __declspec(naked) Detour2()
 
 void SetDetour()
 {
-	CMyInlineHook HookObj;
+	ShaiyaUtility::CMyInlineHook HookObj;
 //	HookObj.Hook((PVOID)0x005c8e20, Detour2, 7);  //神泣r为0x005c8e20 
 //	dwReTurnAdd=HookObj.Hook((PVOID)0x005cd4f0, Detour2, 7);  //凤凰区为0x005cd4f0 
 //	dwReTurnAdd = HookObj.Hook((PVOID)0x0064c200, Detour2, 7);  //美服区为0x0064c200 

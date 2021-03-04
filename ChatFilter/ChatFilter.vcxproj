@@ -113,7 +113,9 @@
     <ClInclude Include="get_players.hpp" />
     <ClInclude Include="hijack.h" />
     <ClInclude Include="instantMount.hpp" />
+    <ClInclude Include="itemmap.hpp" />
     <ClInclude Include="killsRanking.hpp" />
+    <ClInclude Include="linking.hpp" />
     <ClInclude Include="namecolor.hpp" />
     <ClInclude Include="onLogin.hpp" />
     <ClInclude Include="party_hook.hpp" />
