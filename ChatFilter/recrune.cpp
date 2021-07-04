@@ -9,15 +9,16 @@ namespace RecRune
 {
 	CRITICAL_SECTION g_cs;
 	bool g_IsEnable = false;
-	CMyInlineHook g_objIsEnable;
-	CMyInlineHook g_objSetSignature;
-	CMyInlineHook g_objSetSignature1;
-	CMyInlineHook g_objSetSignature2;
-	CMyInlineHook g_objSetStats;
+	ShaiyaUtility::CMyInlineHook g_objIsEnable;
+	ShaiyaUtility::CMyInlineHook g_objSetSignature;
+	ShaiyaUtility::CMyInlineHook g_objSetSignature1;
+	ShaiyaUtility::CMyInlineHook g_objSetSignature2;
+	ShaiyaUtility::CMyInlineHook g_objSetStats;
 	WORD g_oldStats[9] = { 0 };
 
 	bool IsPlusHp = false;
 
+	std::array<bool,255> supported_types;
 
 
 	
@@ -33,8 +34,12 @@ namespace RecRune
 
 	void __stdcall fun_setSignature(DWORD pGear)
 	{
-		if (!g_IsEnable)
+		auto item_type = *PBYTE(pGear + 0x40);
+		if(!supported_types.at(item_type))
+		{
 			return;
+		}
+			
 
 		memcpy(g_oldStats, PVOID(pGear + 0x4c), sizeof(WORD) * 9);
 		IsPlusHp = true;
@@ -150,12 +155,6 @@ namespace RecRune
 			xor edi, edi
 			lea ebp, dword ptr ds : [esi + 0x84]
 
-			cmp dword ptr[esp + 0x28], 0x0046068b
-			je _fun
-			cmp dword ptr[esp + 0x28], 0x004606e3
-			je _fun
-			jmp _Org
-
 			_fun :
 
 			pushad
@@ -209,7 +208,7 @@ namespace RecRune
 	void start()
 	{
 		InitializeCriticalSection(&g_cs);
-		g_objSetSignature.Hook(PVOID(0x004baca6), Naked_SetSignature, 8, fun_setSignature);
+		g_objSetSignature.Hook(PVOID(0x004d2bc5), Naked_SetSignature, 8, fun_setSignature);
 	
 		g_objSetSignature1.Hook(PVOID(0x004baca1), Naked_SetSignature1, 5);
 		g_objSetSignature1.m_pRet =(PVOID) 0x004bacae;

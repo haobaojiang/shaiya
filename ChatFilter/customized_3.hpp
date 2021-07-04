@@ -1,18 +1,21 @@
 #pragma once
-#ifndef SHAIYA_CUSTOMIZED_1_HEADER
-#define SHAIYA_CUSTOMIZED_1_HEADER
+#ifndef SHAIYA_CUSTOMIZED_3_HEADER
+#define SHAIYA_CUSTOMIZED_3_HEADER
 
 #include "stdafx.h"
 #include "config.hpp"
 #include "party_hook.hpp"
 #include "fireport.hpp"
 #include "get_players.hpp"
+#include <mutex>
 
-
-namespace customized_1 {
+namespace customized_3 {
 
 	WORD g_map = 0;
 	ShaiyaUtility::CMyInlineHook g_objCommonSkill;
+
+	std::mutex g_part_tabl_lock;
+	std::map<DWORD,void*> g_parties; // charId as key,party table as value
 
 
 	int g_homeMap = 42;
@@ -25,10 +28,30 @@ namespace customized_1 {
 	// task timer
 	std::vector<WORD> g_expiredTimes;
 
+	bool should_be_same_party(void* playerA, void* playerB) {
+		std::lock_guard lock(g_part_tabl_lock);
+		auto bParty = g_parties.find(ShaiyaUtility::EP6::PlayerCharid(playerB));
+		auto aParty = g_parties.find(ShaiyaUtility::EP6::PlayerCharid(playerA));
+		if (bParty == g_parties.end() ||
+			aParty == g_parties.end() ||
+			aParty->second != bParty->second) {
+			return false;
+		}
+		return true;
+	}
+
+	bool is_same_group_ppl(void* pplA, void* pplB) {
+		auto partyA = ShaiyaUtility::EP6::PlayerParty(pplA);
+		auto partyB = ShaiyaUtility::EP6::PlayerParty(pplB);
+		if (partyA == 0 || partyB == 0) {
+			return false;
+		}
+		return partyA == partyB;
+	}
+
 	bool __stdcall isCommonSkillUsable(void* attack, void* target) {
 
 		bool bRet = (ShaiyaUtility::EP6::PlayerCountry(attack) == ShaiyaUtility::EP6::PlayerCountry(target));
-
 		if (ShaiyaUtility::EP6::PlayerMap(attack) != g_map) {
 			return bRet;
 		}
@@ -36,9 +59,9 @@ namespace customized_1 {
 			return bRet;
 		}
 
-		return false;
+		return is_same_group_ppl(attack, target);
 	}
-	
+
 	__declspec(naked) void  Naked_CommonSkill()
 	{
 		_asm {
@@ -52,7 +75,7 @@ namespace customized_1 {
 	}
 
 	DWORD g_randomSeek = 1120;
-	void __stdcall  SetRandomName(void* player,char* name) {
+	void __stdcall  SetRandomName(void* player, char* name) {
 
 		if (ShaiyaUtility::EP6::PlayerMap(player) != g_map) {
 			return;
@@ -68,9 +91,9 @@ namespace customized_1 {
 	__declspec(naked) void  Naked_RandomName()
 	{
 		_asm {
-			lea ebp,[esp+0x61]
+			lea ebp, [esp + 0x61]
 			pushad
-			MYASMCALL_2(SetRandomName,ebx,ebp)
+			MYASMCALL_2(SetRandomName, ebx, ebp)
 			popad
 			lea ebp, dword ptr ds : [ebx + 0x1C0]
 			jmp g_randomNameHook.m_pRet
@@ -82,9 +105,13 @@ namespace customized_1 {
 	}
 
 
-	void __stdcall process_name(void* player,BYTE* packet) {
+	void __stdcall process_name(void* player_to_send, void* player_send_to ,BYTE* packet) {
 
-		if (ShaiyaUtility::EP6::PlayerMap(player) != g_map) {
+		if (ShaiyaUtility::EP6::PlayerMap(player_to_send) != g_map) {
+			return;
+		}
+
+		if (is_same_group_ppl(player_to_send, player_send_to)) {
 			return;
 		}
 
@@ -107,7 +134,7 @@ namespace customized_1 {
 			mov ecx, dword ptr ss : [esp + 0x18]
 			pushad
 			mov eax, dword ptr[esp + 0x20]
-			MYASMCALL_2(process_name, ebx, eax)
+			MYASMCALL_3(process_name, ebx, ecx,eax)
 			popad
 			jmp g_process_name.m_pRet
 		}
@@ -132,36 +159,29 @@ namespace customized_1 {
 	{
 		_asm {
 			pushad
-			MYASMCALL_1(is_send_zone_user_shape,ebp)
-			cmp al,0x1
+			MYASMCALL_1(is_send_zone_user_shape, ebp)
+			cmp al, 0x1
 			popad
 			je _org
-			add esp,0xc
+			add esp, 0xc
 			jmp g_process_name_3.m_pRet
 
-			_org:
+			_org :
 			call dwCall3
-			jmp g_process_name_3.m_pRet
+				jmp g_process_name_3.m_pRet
 		}
 	}
 
-	
 
-
-
-	bool is_party_able(void* request_player,void* target_player) {
+	bool is_party_able(void* request_player, void* target_player) {
 
 		auto player_map = ShaiyaUtility::EP6::PlayerMap(request_player);
-		if (g_map == player_map) {
-			return false;
-		}
-
 		auto target_map = ShaiyaUtility::EP6::PlayerMap(target_player);
-		if (g_map == target_map) {
-			return false;
+		if (player_map != g_map && target_map != g_map) {
+			return true;
 		}
 
-		return true;
+		return  should_be_same_party(request_player, target_player);
 	}
 
 	//get faction from B
@@ -175,9 +195,11 @@ namespace customized_1 {
 			return result;
 		}
 
-		// reverse country
 		auto country = ShaiyaUtility::EP6::PlayerCountry(playerA);
-		return country == 0 ? 1 : 0;
+		if (!is_same_group_ppl(playerA, playerB)) {
+			return country == 0 ? 1 : 0;
+		}
+		return country;
 	}
 
 
@@ -212,15 +234,13 @@ namespace customized_1 {
 
 	bool __stdcall AttackAble(void* Attacker, void* Target)
 	{
-		if (ShaiyaUtility::EP6::PlayerMap(Attacker) == g_map &&
-			ShaiyaUtility::EP6::PlayerMap(Target) == g_map)
+		if (ShaiyaUtility::EP6::PlayerMap(Attacker) != g_map)
 		{
-			return false;
+			return  ShaiyaUtility::EP6::PlayerCountry(Attacker) != 
+				ShaiyaUtility::EP6::PlayerCountry(Target);
 		}
 
-		auto attack_country = ShaiyaUtility::EP6::PlayerCountry(Attacker);
-		auto target_country = ShaiyaUtility::EP6::PlayerCountry(Target);
-		return attack_country == target_country;
+		return (!is_same_group_ppl(Attacker, Target));
 	}
 
 	ShaiyaUtility::CMyInlineHook g_objAttack;
@@ -228,8 +248,8 @@ namespace customized_1 {
 	{
 		_asm {
 			pushad
-			MYASMCALL_2(AttackAble,eax,edx)
-			cmp al, 0x1             //把结果存放在zf标志位里先
+			MYASMCALL_2(AttackAble, eax, edx)
+			cmp al, 0x0             //把结果存放在zf标志位里先
 			popad
 			sete al
 			pop esi
@@ -244,16 +264,11 @@ namespace customized_1 {
 			return true;
 		}
 
-		if (ShaiyaUtility::EP6::PlayerParty(player)!=0) {
-			LOGD << "ShaiyaUtility::EP6::PlayerParty(player)!=0";
-			return false;
-		}
-
 		// check time
 		SYSTEMTIME st{};
 		GetLocalTime(&st);
-		if(!g_time_bits[st.wHour][st.wMinute]){
-			LOGD << "!g_time_bits[st.wHour][st.wMinute]: " << st.wHour<< " :"<< st.wMinute;
+		if (!g_time_bits[st.wHour][st.wMinute]) {
+			LOGD << "!g_time_bits[st.wHour][st.wMinute]: " << st.wHour << " :" << st.wMinute;
 			return false;
 		}
 
@@ -269,16 +284,24 @@ namespace customized_1 {
 			}
 		}
 
-		if (g_itemId == 0 || g_itemCount==0) {
-			return true;
-		}
-		
-		// consume item
-		if (!ShaiyaUtility::EP6::IsEnoughInventoryItems(player, g_itemId, g_itemCount)) {
+		// must has a party
+		auto party = ShaiyaUtility::EP6::PlayerParty(player);
+		if (party == 0) {
 			return false;
 		}
 
-		return ShaiyaUtility::EP6::DeletePlayerItemid(player, g_itemId, g_itemCount);
+		// process table
+		std::lock_guard lock(g_part_tabl_lock);
+		auto charId = ShaiyaUtility::EP6::PlayerCharid(player);
+		auto part_table = g_parties.find(charId);
+		if (part_table == g_parties.end()) {
+			//if not found
+			g_parties[charId] = (void*)party;
+			return true;
+		}else {
+			// the party table must same with the previous one
+			return (part_table->second == (void*)party);
+		}
 	}
 
 
@@ -291,7 +314,7 @@ namespace customized_1 {
 			}
 			ShaiyaUtility::EP6::MovePlayer(player, g_homeMap, g_homeX, g_homeY, g_homeZ);
 			return true;
-		});
+			});
 
 		Sleep(20 * 1000);
 
@@ -301,7 +324,12 @@ namespace customized_1 {
 			}
 			ShaiyaUtility::EP6::KickPlayer(player);
 			return true;
-		});
+			});
+	}
+
+	void clean_parties() {
+		std::lock_guard lock(g_part_tabl_lock);
+		g_parties.clear();
 	}
 
 	void map_expired_monitor(void*) {
@@ -311,10 +339,11 @@ namespace customized_1 {
 			SYSTEMTIME localTime{};
 			GetLocalTime(&localTime);
 
-			for (auto expiredTime: g_expiredTimes) {
-				if (localTime.wHour == expiredTime && 
-					localTime.wMinute==1) {
+			for (auto expiredTime : g_expiredTimes) {
+				if (localTime.wHour == expiredTime &&
+					localTime.wMinute == 1) {
 					move_out_players();
+					clean_parties();
 					Sleep(20 * 1000);
 					break;
 				}
@@ -328,7 +357,7 @@ namespace customized_1 {
 
 	void start() {
 
-		auto section = "customized_1";
+		auto section = "customized_3";
 
 		if (!GameConfiguration::GetBoolean(section, "enable", false)) {
 			return;
@@ -345,7 +374,7 @@ namespace customized_1 {
 		g_itemCount = GameConfiguration::GetInteger(section, "item_count", 0);
 
 
-		LOGD << "itemid:" << g_itemId <<" item_count:"<< g_itemCount;
+		LOGD << "itemid:" << g_itemId << " item_count:" << g_itemCount;
 
 
 		g_map = static_cast<WORD>(map);
@@ -418,9 +447,9 @@ namespace customized_1 {
 
 		// 00426C72     /EB 22                jmp Xps_game.00426C96
 		{
-		BYTE data[] = { 0xeb,0x22 };
-		ShaiyaUtility::WriteCurrentProcessMemory((void*)0x00426C72, data, 2);
-	}
+			BYTE data[] = { 0xeb,0x22 };
+			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x00426C72, data, 2);
+		}
 
 		{
 			BYTE data[] = { 0xeb,0x22 };
@@ -430,7 +459,7 @@ namespace customized_1 {
 			//00426AE4     /E9 AD010000          jmp ps_game.00426C96
 
 
-			BYTE data[] = { 0xE9 ,0xAD ,0x01 ,0x00 ,0x00};
+			BYTE data[] = { 0xE9 ,0xAD ,0x01 ,0x00 ,0x00 };
 			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x00426AE4, data, 5);
 		}
 

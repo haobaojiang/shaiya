@@ -79,6 +79,15 @@
     <ClInclude Include="linking.hpp">
       <Filter>features</Filter>
     </ClInclude>
+    <ClInclude Include="custom_packet.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="customized_3.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="newmount.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

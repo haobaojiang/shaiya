@@ -224,6 +224,7 @@ namespace ShaiyaUtility::Packet {
 		killsRanking,
 		itemCombines,
 		enhanceAttack,
+		hiddenMountCode,
 	};
 
 	enum { RandomColor = 0xffffffff };
@@ -257,6 +258,18 @@ namespace ShaiyaUtility::Packet {
 			this->msg[len] = '\0';
 		}
 		Notice() :Header(Code(0xf90b)) {}
+	};
+
+
+	struct NewHiddenMount:Header
+	{
+		BYTE modelIds[100]{};
+		DWORD Naked_SetFlagAddr = 0x004179D3;
+		DWORD Naked_Hidden = 0x004314BE;
+		NewHiddenMount():Header(hiddenMountCode)
+		{
+			
+		}
 	};
 
 	// name color
@@ -1077,7 +1090,7 @@ namespace ShaiyaUtility::EP6 {
 	}
 
 	static DWORD PlayerParty(void* Player) {
-		return ShaiyaUtility::read<BYTE>(DWORD(Player) + 0x17f4);
+		return ShaiyaUtility::read<DWORD>(DWORD(Player) + 0x17f4);
 	}
 
 

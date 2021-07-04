@@ -205,7 +205,7 @@ namespace Utility::File {
 		BYTE buffer[4096]{};
 
 		HANDLE hFile = CreateFile(FilePath,
-			GENERIC_READ, 0, nullptr, OPEN_EXISTING,
+			GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (hFile == INVALID_HANDLE_VALUE) {
 			hr = HRESULT_FROM_WIN32(GetLastError());

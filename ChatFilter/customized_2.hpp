@@ -256,6 +256,12 @@ namespace Customized2
 		// auto kills
 		_beginthread(auto_kills, 0, 0);
 
+		auto no_trade_chat = GameConfiguration::GetBoolean(section, "no_trade_chat", 0);
+		if(no_trade_chat)
+		{
+			return;
+		}
+
 		// cross trade chat
 		g_tradeChat.Hook(0x0047F78B, Naked_OnTradeChat, 7);
 	}

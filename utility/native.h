@@ -87,7 +87,7 @@ namespace Utility::Native {
 
 
 	template<typename T>
-	T GetNativeProcAddress(_In_ const char* Name) {
+	static T GetNativeProcAddress(_In_ const char* Name) {
 		static 	auto module = LoadLibrary(L"Ntdll.dll");
 		if (module == nullptr) {
 			return (T)nullptr;
@@ -95,7 +95,7 @@ namespace Utility::Native {
 		return (T)GetProcAddress(module, Name);
 	}
 
-	HRESULT ZwQuerySystemInformation_SysmHndInfo(_In_ PSYSTEM_HANDLE_INFORMATION* Output) {
+	static HRESULT ZwQuerySystemInformation_SysmHndInfo(_In_ PSYSTEM_HANDLE_INFORMATION* Output) {
 
 		static auto ZwQuerySystemInformation = GetNativeProcAddress<ZwQuerySystemInformationDef>("ZwQuerySystemInformation");
 		RETURN_IF_NULL_ALLOC(ZwQuerySystemInformation);
@@ -117,7 +117,21 @@ namespace Utility::Native {
 		RETURN_HR(S_OK);
 	}
 
-	HRESULT ZwDuplicatedObject(HANDLE SourceProcessHandle,
+
+	static HRESULT ZwQuerySystemInformation(
+		_In_      SYSTEM_INFORMATION_CLASS SystemInformationClass,
+		_Inout_   PVOID                    SystemInformation,
+		_In_      ULONG                    SystemInformationLength,
+		_Out_opt_ PULONG                   ReturnLength
+		)
+	{
+		static auto p = GetNativeProcAddress<ZwQuerySystemInformationDef>("ZwQuerySystemInformation");
+		RETURN_IF_NULL_ALLOC(p);
+		return p(SystemInformationClass, SystemInformation, SystemInformationLength, ReturnLength);
+	}
+
+
+	static HRESULT ZwDuplicatedObject(HANDLE SourceProcessHandle,
 		HANDLE      SourceHandle,
 		HANDLE      TargetProcessHandle,
 		PHANDLE     TargetHandle,

@@ -3,6 +3,7 @@
 #define SHAIYA_UTILITY_PROCESS_HEADER
 
 #include <windows.h>
+#include <wil/resource.h>
 #include <Shlwapi.h>
 #define PSAPI_VERSION 1
 #include <Psapi.h>
@@ -113,39 +114,55 @@ namespace Utility::Process {
 		return hr;
 	}
 
+	using MemFilter = std::function<bool(const MEMORY_BASIC_INFORMATION&)>;
+	static std::vector<MEMORY_BASIC_INFORMATION> GetMemRanges(HANDLE Process, MemFilter Filter)
+	{
+		std::vector<MEMORY_BASIC_INFORMATION> result;
+		unsigned char* p = nullptr;
+		MEMORY_BASIC_INFORMATION info;
+
+		while (true) {
+			const SIZE_T s = VirtualQueryEx(Process, p, &info, sizeof(info));
+			if (s == 0) {
+				break;
+			}
+			p += info.RegionSize;
+			if (!Filter(info)) {
+				continue;
+			}
+			result.push_back(info);
+		}
+		return result;
+	}
+
+
 	static HRESULT FindProcessIdByName(_In_ const std::wstring& ProcessName, _Inout_ DWORD* Pid)
 	{
-		HRESULT hr = S_OK;
-
+		
 		*Pid = 0;
 
-		auto hProcSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-		if (!hProcSnap) {
-			hr = HRESULT_FROM_WIN32(GetLastError());
-			return hr;
-		}
+		wil::unique_handle hProcSnap(::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0));
+		RETURN_LAST_ERROR_IF(!hProcSnap);
 
 		PROCESSENTRY32W tEntry = { 0 };
 		tEntry.dwSize = sizeof(PROCESSENTRY32W);
-
-		// Iterate threads
-		for (BOOL success = Process32FirstW(hProcSnap, &tEntry);
-			success != FALSE;
-			success = Process32NextW(hProcSnap, &tEntry))
-		{
+	
+		RETURN_IF_WIN32_BOOL_FALSE(::Process32FirstW(hProcSnap.get(), &tEntry));
+		while (true)
+		{	
 			if (_wcsicmp(tEntry.szExeFile, ProcessName.c_str()) == 0) {
 				*Pid = tEntry.th32ProcessID;
+				RETURN_HR(S_OK);
+			}
+			
+			if(!Process32NextW(hProcSnap.get(), &tEntry)){
+				break;
 			}
 		}
-
-		CloseHandle(hProcSnap);
-
-		if (GetLastError() != ERROR_NO_MORE_FILES) {
-			hr = HRESULT_FROM_WIN32(GetLastError());
-			return hr;
+		if (GetLastError() == ERROR_NO_MORE_FILES) {
+			RETURN_HR(ERROR_NOT_FOUND);
 		}
-
-		return hr;
+		RETURN_LAST_ERROR();
 	}
 
 
@@ -225,18 +242,18 @@ namespace Utility::Process {
 		return hr;
 	}
 
-    static HRESULT GetCurProcessParentId(_Inout_ DWORD* Output)
+	static HRESULT GetCurProcessParentId(_Inout_ DWORD* Output)
 	{
-		
+
 		wil::unique_handle snapshot(::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0));
 		RETURN_LAST_ERROR_IF(!snapshot);
 
 		PROCESSENTRY32 procentry{};
 		procentry.dwSize = sizeof(PROCESSENTRY32);
 		RETURN_IF_WIN32_BOOL_FALSE(Process32First(snapshot.get(), &procentry));
-		
+
 		DWORD pid = 0;
-		
+
 		// While there are processes, keep looping.
 		DWORD  crtpid = GetCurrentProcessId();
 		while (true)
@@ -270,6 +287,26 @@ namespace Utility::Process {
 
 		return ret;
 	}
+
+
+
 	
+	static HRESULT EnumProcessModules(HANDLE Process,std::vector<MODULEINFO>* Modules){
+		
+		HMODULE hMods[1024]{};
+		DWORD cbNeeded{};
+
+		RETURN_IF_WIN32_BOOL_FALSE(::EnumProcessModules(Process, hMods, sizeof(hMods), &cbNeeded));
+
+		for (DWORD i = 0; i < (cbNeeded / sizeof(HMODULE)); i++){
+			MODULEINFO info{};
+			DWORD cb{};
+			if (!::GetModuleInformation(Process, hMods[i], &info,sizeof(info))){
+				continue;
+			}
+			Modules->push_back(info);
+		}
+		RETURN_HR(S_OK);
+	}
 }
 #endif

@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "hijack.h"  
+
+#include "hijack.h"
 #include "config.hpp"
 #include "onLogin.hpp"
 #include "namecolor.hpp"
@@ -20,13 +21,16 @@
 #include "customized_2.hpp"
 #include "itemmap.hpp"
 #include "linking.hpp"
+#include "custom_packet.hpp"
+#include "customized_3.hpp"
+#include "newmount.hpp"
 
 bool IsInjectAble() {
 
 	WCHAR szProcessName[MAX_PATH] = { 0 };
 	GetModuleBaseName(GetCurrentProcess(), NULL, szProcessName, sizeof(szProcessName));
 	if (wcscmp(szProcessName, L"ps_game.exe") == 0) {
-		return true;	
+		return true;
 	}
 	return false;
 }
@@ -41,7 +45,7 @@ BOOL InitLogging() {
 	// folder
 	if (!CreateDirectory(path.c_str(), nullptr)) {
 		// something went wrong
-		if (GetLastError()== ERROR_PATH_NOT_FOUND) {
+		if (GetLastError() == ERROR_PATH_NOT_FOUND) {
 			return FALSE;
 		}
 	}
@@ -158,7 +162,7 @@ void subProcess(void* p) {
 	autoSummon::Start();
 	randomRes::Start();
 	Customconsole::Start();
-	
+
 	skillCallBack::Start();
 	//deadlockFix::Start();
 
@@ -247,7 +251,7 @@ void subProcess(void* p) {
 	if (GetPrivateProfileInt(L"itemformap", L"enable", 0, g_szFilePath) == 1) {
 		LOGD << "itemformap start!";
 		itemForMap::start();
- 	}
+	}
 
 	if (GetPrivateProfileInt(L"vipCrossTradeChannel", L"enable", 0, g_szFilePath) == 1) {
 		LOGD << "vipCrossTradeChannel start!";
@@ -297,7 +301,7 @@ void subProcess(void* p) {
 		LOGD << "Questlimited start!";
 		QuestLimited::Start();
 	}
-	
+
 
 	if (GetPrivateProfileInt(L"dailiMap", L"enable", 0, g_szFilePath) == 1) {
 		LOGD << "dailiMap start!";
@@ -319,7 +323,7 @@ void subProcess(void* p) {
 		Hunting::Start();
 	}
 
-	
+
 
 
 
@@ -340,51 +344,98 @@ void subProcess(void* p) {
 
 	*/
 }
+#include "../utility/file.h"
+#ifndef _DEBUG
+#include "VMProtectSDK.h"
+bool check_vmp_license() {
 
+
+	VMProtectBegin(__FUNCTION__);
+	auto path = ShaiyaUtility::GetCurrentExePathW();
+	path += L"\\license";
+
+	std::vector<BYTE> data;
+	auto hr = Utility::File::ReadFileData(path.c_str(), &data);
+	LOGD << "hr:" << hr;
+
+	VMProtectSetSerialNumber((char*)(data.data()));
+
+	int state = VMProtectGetSerialNumberState();
+	if (state != 0) {
+		return false;
+	}
+	return true;
+	VMProtectEnd();
+
+}
+#endif
 
 void Main()
 {
 
-	if (!IsInjectAble()) {
-		return;
+
+
+#ifndef  _DEBUG
+	VMProtectBegin(__FUNCTION__);
+#endif
+
+
+#ifndef  _DEBUG
+	if (check_vmp_license()) {
+#endif
+
+
+
+
+
+
+		LOGD << "after InitLogging";
+
+		if (!GameConfiguration::Init()) {
+			LOGE << "failed to init configuration";
+			return;
+		}
+
+		if (!InitGame()) {
+			LOGE << "failed to init game";
+			return;
+		}
+
+		LOGD << "after InitGame";
+
+		getPlayer::Start();
+		NameColor::Start();
+		SkillCutting::Start();
+		KillsRanking::Start();
+		Combine::Start();
+		EncryptReadChar::Start();
+		EnhanceDelay::start();
+		InstantMount::Start();
+		enhanceAck::Start();
+		randomRes::Start();
+		part_hook::start();
+		fire_port::start();
+		customized_1::start();
+		banned_item::start();
+		StartShareKill();
+		Customized2::start(NameColor::applyPlayerColor, NameColor::removePlayerColor);
+		itemForMap::start();
+		linking::start();
+		CustomPacket::start();
+		customized_3::start();
+		NewMount::start();
+#ifndef  _DEBUG
 	}
 
-	if (!InitLogging()) {
-		return;
+	else {
+		LOGD << "invalid license";
+		ExitProcess(0);
 	}
+#endif
 
-	LOGD << "after InitLogging";
-
-	if (!GameConfiguration::Init()) {
-		LOGE << "failed to init configuration";
-		return;
-	}
-
-	if (!InitGame()) {
-		LOGE << "failed to init game";
-		return;
-	}
-
-	LOGD << "after InitGame";
-
-	getPlayer::Start();
-	NameColor::Start();
-	SkillCutting::Start();
-	KillsRanking::Start();
-	Combine::Start();
-	EncryptReadChar::Start();
-	EnhanceDelay::start();
-	InstantMount::Start();
-	enhanceAck::Start();
-	randomRes::Start();
-	part_hook::start();
-	fire_port::start();
-	customized_1::start();
-	banned_item::start();
-	StartShareKill();
-	Customized2::start(NameColor::applyPlayerColor,NameColor::removePlayerColor);
-	itemForMap::start();
-	linking::start();
+#ifndef  _DEBUG
+	VMProtectEnd();
+#endif
 }
 
 BOOL APIENTRY DllMain(
@@ -396,6 +447,13 @@ BOOL APIENTRY DllMain(
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		if (!IsInjectAble()) {
+			break;
+		}
+
+		if (!InitLogging()) {
+			break;
+		}
 		Main();
 		break;
 	case DLL_THREAD_ATTACH:

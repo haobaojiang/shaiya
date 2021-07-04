@@ -31,6 +31,7 @@ namespace linking
 			jg _org
 
 			sub edx,0x64
+			sub edx, 0x17
 			mov eax,edx
 
 			jmp g_rate3Addr
@@ -55,6 +56,7 @@ namespace linking
 			jg _org
 
 			sub edx, 0x64
+			sub edx, 0x17
 			mov eax, edx
 
 
@@ -78,6 +80,7 @@ namespace linking
 			jg _org
 
 			sub edx, 0x64
+			sub edx,0x17
 			mov eax, edx
 
 
@@ -140,17 +143,6 @@ namespace linking
 			char key[200]{};
 			sprintf_s(key, 200, "%d", i + 1);
 			int price = p->GetInteger("price", key, 0);
-			if (price == 0)
-			{
-				if (i > 0)
-				{
-					price = g_prices.at(i - 1);
-				}
-				else
-				{
-					price = 50000; // default rate
-				}
-			}
 			LOGD << "i:" << i << "  price:" << price;
 			g_prices[i] = price+20;
 		}

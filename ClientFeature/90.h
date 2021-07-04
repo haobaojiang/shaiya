@@ -13,6 +13,133 @@
 
 namespace Shaiya90
 {
+
+	void SendPacket(void* p, DWORD  l)
+	{
+		DWORD dwCall = 0x00595140;
+		_asm {
+			push l
+			push p
+			call dwCall
+			add esp, 0x8
+		}
+	}
+
+	namespace NewMountFeature
+	{
+		std::array<DWORD, 100> g_modelIds;
+
+
+		ShaiyaUtility::CMyInlineHook g_objSetFlag;
+		ShaiyaUtility::CMyInlineHook g_objHidden;
+
+
+		__declspec(naked) void Naked_Hidden()
+		{
+			_asm
+			{
+				cmp dword ptr[ebp + 0x124], 0x0
+				je __originalcode
+				push esi
+				mov esi, 0x2206060
+				mov dword ptr[esi + 0x30], 0
+				mov dword ptr[esi + 0x34], 0
+				mov dword ptr[esi + 0x38], 0
+				pop esi
+				__originalcode :
+				mov al, byte ptr [ebp + 0x7C]
+					test al, al
+					jmp g_objHidden.m_pRet
+			}
+		}
+
+
+
+		bool __stdcall is_set_hidden_flag(DWORD modelId)
+		{
+#ifndef _DEBUG
+			VMProtectBegin(__FUNCDNAME__);
+#endif
+			for (const auto& flagModelId : g_modelIds)
+			{
+				if(flagModelId==0)
+				{
+					break;
+				}
+				if (modelId == flagModelId)
+				{
+					return true;
+				}
+			}
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif
+			return false;
+
+		}
+
+		__declspec(naked) void Naked_SetFlag()
+		{
+			_asm
+			{
+				movzx ecx, byte ptr[esi + 0x00000385]
+				mov dword ptr[eax + 0x124], 0x0 //default is not to hide
+				pushad
+				MYASMCALL_1(is_set_hidden_flag, ecx)
+				cmp al, 0x0
+				je __NotSeet
+				
+				popad
+				mov dword ptr[eax + 0x124], 0x1
+				jmp g_objSetFlag.m_pRet
+				
+				__NotSeet :
+				popad
+					jmp g_objSetFlag.m_pRet
+			}
+		}
+
+
+		void process_server_message(void* packet)
+		{
+#ifndef _DEBUG
+			VMProtectBegin(__FUNCDNAME__);
+#endif
+			ShaiyaUtility::Packet::NewHiddenMount* p = (struct ShaiyaUtility::Packet::NewHiddenMount*)packet;
+			for (int i = 0;i < g_modelIds.size();i++)
+			{
+				g_modelIds[i] = p->modelIds[i];
+			}
+			static bool flag = false;
+			if (flag)
+			{
+				return;
+			}
+			flag = true;
+			BYTE limitMountModel = 0x57;
+			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x004C81F5, &limitMountModel, 1);
+			g_objSetFlag.Hook((void*)p->Naked_SetFlagAddr, Naked_SetFlag, 7);
+			g_objHidden.Hook((void*)p->Naked_Hidden, Naked_Hidden, 5);
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif
+		}
+
+		void start()
+		{
+#ifndef _DEBUG
+			VMProtectBegin(__FUNCDNAME__);
+#endif
+			BYTE maxObjectSize = 0x28;
+			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x0041799A, &maxObjectSize, 1);
+
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif
+		}
+	}
+
+
 	namespace multipleClient
 	{
 
@@ -37,7 +164,7 @@ namespace Shaiya90
 			return ret;
 		}
 
-		
+
 		std::optional<int> get_game_nums()
 		{
 			DWORD aProcesses[1024]{};
@@ -73,7 +200,7 @@ namespace Shaiya90
 			return count;
 		}
 
-		
+
 		int get_client_allowed_num()
 		{
 			char dir[MAX_PATH]{};
@@ -117,10 +244,10 @@ namespace Shaiya90
 		{
 			_beginthread(worker, 0, 0);
 		}
-		
+
 	}
 
-	
+
 	namespace SkillCutting {
 
 		ShaiyaUtility::CMyInlineHook g_fully;
@@ -152,13 +279,13 @@ namespace Shaiya90
 
 		void FullySkillCutting() {
 			static bool  flag = false;
-			if(flag)
+			if (flag)
 			{
 				return;
 			}
 			g_fully.Hook(reinterpret_cast<void*>(0x0043d62f), Naked_fully, 6);
 			flag = true;
-				
+
 		}
 
 		void ProcessPacket(PVOID Packet) {
@@ -274,15 +401,15 @@ namespace Shaiya90
 		void StartWorker() {
 
 			static bool flag = false;
-			if(flag)
+			if (flag)
 			{
-				return ;
+				return;
 			}
 			flag = true;
-				objNormal.Hook((PVOID)0x0044b5c6, Naked_Normal, 11);
-				ObjParty.Hook((PVOID)0x0044b664, Naked_Party, 8);
-				_beginthread(GenerateRandomColor, 0, nullptr);
-			
+			objNormal.Hook((PVOID)0x0044b5c6, Naked_Normal, 11);
+			ObjParty.Hook((PVOID)0x0044b664, Naked_Party, 8);
+			_beginthread(GenerateRandomColor, 0, nullptr);
+
 		}
 	}
 
@@ -293,29 +420,29 @@ namespace Shaiya90
 			auto packet = reinterpret_cast<ShaiyaUtility::Packet::KillsRankingContent*>(p);
 
 			static bool flag = false;
-			if(flag)
+			if (flag)
 			{
 				return;
 			}
 			flag = true;
-		
-				ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708298),
-					packet->killsNeeded,
-					sizeof(packet->killsNeeded));
 
-				ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708118),
-					packet->normalModePoints,
-					sizeof(packet->normalModePoints));
+			ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708298),
+				packet->killsNeeded,
+				sizeof(packet->killsNeeded));
+
+			ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708118),
+				packet->normalModePoints,
+				sizeof(packet->normalModePoints));
 
 
-				ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708198),
-					packet->hardModePoints,
-					sizeof(packet->hardModePoints));
+			ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708198),
+				packet->hardModePoints,
+				sizeof(packet->hardModePoints));
 
-				ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708218),
-					packet->ultimateModePoints,
-					sizeof(packet->ultimateModePoints));
-				
+			ShaiyaUtility::WriteCurrentProcessMemory(reinterpret_cast<void*>(0x00708218),
+				packet->ultimateModePoints,
+				sizeof(packet->ultimateModePoints));
+
 		}
 
 	}
@@ -425,6 +552,12 @@ namespace Shaiya90
 				getEnhanceAttack::Process(P);
 				break;
 			}
+			case ShaiyaUtility::Packet::hiddenMountCode:
+				{
+				NewMountFeature::process_server_message(P);
+				break;
+				}
+				
 			default:
 				break;
 			}
@@ -592,41 +725,29 @@ namespace Shaiya90
 
 				DWORD InternalEnumWindows_addr = Get_InternalEnumWindows_Addr();
 
-				do
-				{
-					if ((bRet = IsHook(pfunGetTickCount)) == true) {
+				std::vector<DWORD> addrs = { 0x00595e40 ,
+	0x00595ea0,
+	0x0059a64c,
+	0x0059a710,
+	0x0059a72c,
+	0x0041d21c,
+	DWORD(pfunGetTickCount),
+	DWORD(pfunGetTickCount64) ,
+	DWORD(pfunQueryPerformanceCounter),
+	DWORD(pfuntimeGetTime),
+	DWORD(pfunFindWindow),
+	DWORD(pDbgUiRemoteBreakin),
+	DWORD(InternalEnumWindows_addr) };
+
+
+
+
+				for (auto addr : addrs) {
+					bRet = IsHook((PBYTE)addr);
+					if (bRet) {
 						break;
 					}
-
-					if ((bRet = IsHook((BYTE*)0x0041d21c)) == true) {
-						break;
-					}
-
-					if ((bRet = IsHook(pfunGetTickCount64)) == true) {
-						break;
-					}
-
-					if ((bRet = IsHook(pfunQueryPerformanceCounter)) == true) {
-						break;
-					}
-
-					if ((bRet = IsHook(pfuntimeGetTime)) == true) {
-						break;
-					}
-
-					if ((bRet = IsHook(pfunFindWindow)) == true) {
-						break;
-					}
-
-					if ((bRet = IsHook(pDbgUiRemoteBreakin)) == true) {
-						break;
-					}
-
-					if ((bRet = IsHook((PBYTE)InternalEnumWindows_addr)) == true) {
-						break;
-					}
-
-				} while (0);
+				}
 
 				return bRet;
 			}
@@ -728,6 +849,79 @@ namespace Shaiya90
 			RETURN_HR(S_OK);
 		}
 
+		bool illegalMemCheck()
+		{
+#ifndef _DEBUG
+			VMProtectBegin("illegalMemCheck");
+#endif
+			auto memInfos = Utility::Process::GetMemRanges(GetCurrentProcess(), [](const MEMORY_BASIC_INFORMATION& info)->bool {
+
+				if (info.Type != MEM_PRIVATE) {
+					return false;
+				}
+
+				if (info.RegionSize < 0x2000) {
+					return false;
+				}
+
+				return (info.Protect & PAGE_EXECUTE) ||
+					(info.Protect & PAGE_EXECUTE_READ) ||
+					(info.Protect & PAGE_EXECUTE_READWRITE) ||
+					(info.Protect & PAGE_EXECUTE_WRITECOPY);
+				}
+			);
+
+			if (memInfos.empty()) {
+				return false;
+			}
+
+			std::vector<MODULEINFO> mods;
+			auto hr = Utility::Process::EnumProcessModules(GetCurrentProcess(), &mods);
+			if (FAILED(hr)) {
+				return false;
+			}
+
+			for (const auto& mem : memInfos) {
+
+				bool legal = false;
+				for (const auto& mod : mods) {
+					const auto modTail = reinterpret_cast<INT64>(mod.EntryPoint) + mod.SizeOfImage;
+					const auto memTail = reinterpret_cast<INT64>(mem.BaseAddress) + mem.RegionSize;
+					if (mem.BaseAddress >= mod.EntryPoint && modTail > memTail) {
+						legal = true;
+						break;
+					}
+				}
+
+				if (!legal) {
+					WCHAR temp[MAX_PATH]{};
+					StringCchPrintf(temp, MAX_PATH, L"found illegal mem:%p,size:%x\n", mem.BaseAddress, mem.RegionSize);
+					OutputDebugStringW(temp);
+					return true;
+				}
+			}
+			return false;
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif
+		}
+
+		void SendServer()
+		{
+			while (true)
+			{
+				if (*PDWORD(0x00863638))
+				{
+					Sleep(50 * 1000);
+					BYTE p[4] = {};
+					*reinterpret_cast<PDWORD>(p) = 0xfe01;
+					SendPacket(p, sizeof(p));
+					return;
+				}
+				Sleep(3 * 1000);
+			}
+		}
+
 
 		void ThreadProc(_In_  LPVOID lpParameter) {
 #ifndef _DEBUG
@@ -735,10 +929,16 @@ namespace Shaiya90
 #endif
 			while (true)
 			{
+				if (illegalMemCheck())
+				{
+			//		TerminateProcess(GetCurrentProcess(), 0);
+					SendServer();
+					break;
+				}
 				tectAndCloseHakcingProcHnd();
 				if (AntiSpeedHacke::IsHacked()) {
-					Sleep(10 * 1000);
-					TerminateProcess(GetCurrentProcess(), 0);
+					SendServer();
+					break;
 				}
 				Sleep(5000);
 			}
@@ -775,16 +975,19 @@ namespace Shaiya90
 	}
 
 
+
+
 	void Start()
 	{
-//		VerifyParentProcess();
-		
+		//		VerifyParentProcess();
+
 		custompacket::Start();
 		ijl15Detection::Start();
 		antiHacker::Start();
 		ReadCharDecryption::Start();
 		getEnhanceAttack::Start();
-	multipleClient::start();
+		multipleClient::start();
+		NewMountFeature::start();
 	}
 
 }

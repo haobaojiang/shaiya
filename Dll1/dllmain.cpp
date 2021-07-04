@@ -10,6 +10,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // µ¼³öº¯Êý
+/*
 #pragma comment(linker, "/EXPORT:SymGetOmapBlockBase=dbghelpOrg.SymGetOmapBlockBase,@1")
 #pragma comment(linker, "/EXPORT:DbgHelpCreateUserDump=dbghelpOrg.DbgHelpCreateUserDump,@2")
 #pragma comment(linker, "/EXPORT:DbgHelpCreateUserDumpW=dbghelpOrg.DbgHelpCreateUserDumpW,@3")
@@ -217,6 +218,7 @@
 #pragma comment(linker, "/EXPORT:vc7fpo=dbghelpOrg.vc7fpo,@205")
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+*/
 #include <string>
 #include <sstream>
 #include <algorithm>
@@ -225,6 +227,8 @@
 #include <vector>
 #include <process.h>
 #include "../utility/utility.h"
+
+
 
 namespace GamelogFix {
 
@@ -338,6 +342,7 @@ namespace GamelogFix {
 		}
 	}
 }
+
 
 namespace GameFix {
 
@@ -529,9 +534,10 @@ namespace GameFix {
 				return false;
 			}
 
-			if (!ConnectLog()) {
+		
+	//		if (!ConnectLog()) {
 
-			}
+		//	}
 
 		}
 
@@ -542,15 +548,20 @@ namespace GameFix {
 	void fix_ps_game() {
 
 	}
+	
 }
 
+
+/*
 void __stdcall SThreadStartMonitor(DWORD ESP,DWORD obj) {
 	OutputDebugStringW(std::to_wstring(obj).c_str());
 	if (ESP < 0x00401000 || ESP>0x00584fff) {	
 		OutputDebugStringW(std::to_wstring(obj).c_str());
 	}
 }
+*/
 
+/*
 ShaiyaUtility::CMyInlineHook g_thredstartHook;
 __declspec(naked) void  Naked_SThreadStart() {
 	_asm {
@@ -570,12 +581,12 @@ void testHook() {
 	g_thredstartHook.Hook(0x00515be0, Naked_SThreadStart, 7);
 
 }
-
+*/
 void threadProc(void*) {
 
-	GamelogFix::fix_ps_gamelog();
+	//GamelogFix::fix_ps_gamelog();
 
-	testHook();
+	//testHook();
 
 	/*
 	DWORD pid = 0;
@@ -618,8 +629,8 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, PVOID pvReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		DisableThreadLibraryCalls(hModule);
-		threadProc(nullptr);
+//		DisableThreadLibraryCalls(hModule);
+//		threadProc(nullptr);
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)
 	{
