@@ -27,75 +27,447 @@ namespace Shaiya90
 
 	namespace NewMountFeature
 	{
-		std::array<DWORD, 100> g_modelIds;
+		struct model
+		{
+			bool enabled{};
+			bool need_rotate{};
+			float height{};
+			DWORD boneId{};
+		};
+		
+		std::array<model, 255> g_models;
+
+		ShaiyaUtility::CMyInlineHook g_objRotate1, g_objRotate2, g_objRotate3, g_objRotate4;
+		ShaiyaUtility::CMyInlineHook g_objBoneId1; // human
+		ShaiyaUtility::CMyInlineHook g_objBoneId2;
+		ShaiyaUtility::CMyInlineHook g_objBoneId3;// 
+		ShaiyaUtility::CMyInlineHook g_objBoneId4;
+		ShaiyaUtility::CMyInlineHook g_objBoneId5;// 
+		ShaiyaUtility::CMyInlineHook g_objBoneId6;
+		ShaiyaUtility::CMyInlineHook g_objBoneId7;// 
+		ShaiyaUtility::CMyInlineHook g_objBoneId8;
+		ShaiyaUtility::CMyInlineHook g_objFixHeight;
 
 
-		ShaiyaUtility::CMyInlineHook g_objSetFlag;
-		ShaiyaUtility::CMyInlineHook g_objHidden;
+		void __stdcall fix_height(DWORD mountObj,BYTE modelId)
+		{
+			auto model = g_models[modelId];
+			if (!model.enabled)
+			{
+				return;
+			}
+			
+			if(model.height< 0.1)
+			{
+				return;
+			}
+			
+			*(PFLOAT(mountObj + 0xf8)) = model.height;
+		}
 
 
-		__declspec(naked) void Naked_Hidden()
+		bool __stdcall is_rotate_player(BYTE modelId)
+		{
+			return  g_models[modelId].enabled && g_models[modelId].need_rotate;
+		}
+
+		DWORD __stdcall get_bone_id(BYTE modelId)
+		{
+			auto model = g_models[modelId];
+			if(!model.enabled)
+			{
+				return 0;
+			}
+			return model.boneId;
+		}
+
+		__declspec(naked) void Naked_fixBone1()
 		{
 			_asm
 			{
-				cmp dword ptr[ebp + 0x124], 0x0
-				je __originalcode
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
 				push esi
-				mov esi, 0x2206060
-				mov dword ptr[esi + 0x30], 0
-				mov dword ptr[esi + 0x34], 0
-				mov dword ptr[esi + 0x38], 0
+				push edi
+				push esp
+				push ebp
+
+				
+				movzx eax,byte ptr [ebx+0x385]
+				MYASMCALL_1(get_bone_id,eax)
+				
+				pop ebp
+				pop esp
+				pop edi
 				pop esi
-				__originalcode :
-				mov al, byte ptr [ebp + 0x7C]
-					test al, al
-					jmp g_objHidden.m_pRet
+				pop edx
+				pop ecx
+				pop ebx
+
+				cmp eax,0x0
+				je _Org
+				push eax
+				push g_objBoneId1.m_pRet
+				add dword ptr [esp],0x2
+				ret
+				_Org:
+				jmp g_objBoneId1.m_pRet
 			}
 		}
 
-
-
-		bool __stdcall is_set_hidden_flag(DWORD modelId)
-		{
-#ifndef _DEBUG
-			VMProtectBegin(__FUNCDNAME__);
-#endif
-			for (const auto& flagModelId : g_modelIds)
-			{
-				if(flagModelId==0)
-				{
-					break;
-				}
-				if (modelId == flagModelId)
-				{
-					return true;
-				}
-			}
-#ifndef _DEBUG
-			VMProtectEnd();
-#endif
-			return false;
-
-		}
-
-		__declspec(naked) void Naked_SetFlag()
+		__declspec(naked) void Naked_fixBone7()
 		{
 			_asm
 			{
-				movzx ecx, byte ptr[esi + 0x00000385]
-				mov dword ptr[eax + 0x124], 0x0 //default is not to hide
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
+				push esi
+				push edi
+				push esp
+				push ebp
+
+
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(get_bone_id, eax)
+
+				pop ebp
+				pop esp
+				pop edi
+				pop esi
+				pop edx
+				pop ecx
+				pop ebx
+
+				cmp eax, 0x0
+				je _Org
+				push eax
+				push g_objBoneId7.m_pRet
+				add dword ptr[esp], 0x2
+				ret
+				_Org :
+				jmp g_objBoneId7.m_pRet
+			}
+		}
+
+		__declspec(naked) void Naked_fixBone8()
+		{
+			_asm
+			{
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
+				push esi
+				push edi
+				push esp
+				push ebp
+
+
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(get_bone_id, eax)
+
+				pop ebp
+				pop esp
+				pop edi
+				pop esi
+				pop edx
+				pop ecx
+				pop ebx
+
+				cmp eax, 0x0
+				je _Org
+				push eax
+				push g_objBoneId8.m_pRet
+				add dword ptr[esp], 0x2
+				ret
+				_Org :
+				jmp g_objBoneId8.m_pRet
+			}
+		}
+
+
+
+		__declspec(naked) void Naked_fixBone2()
+		{
+			_asm
+			{
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
+				push esi
+				push edi
+				push esp
+				push ebp
+
+
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(get_bone_id, eax)
+
+				pop ebp
+				pop esp
+				pop edi
+				pop esi
+				pop edx
+				pop ecx
+				pop ebx
+
+				cmp eax, 0x0
+				je _Org
+				push eax
+				push g_objBoneId2.m_pRet
+				add dword ptr[esp], 0x2
+				ret
+				_Org :
+				jmp g_objBoneId2.m_pRet
+			}
+		}
+
+		__declspec(naked) void Naked_fixBone3()
+		{
+			_asm
+			{
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
+				push esi
+				push edi
+				push esp
+				push ebp
+
+
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(get_bone_id, eax)
+
+				pop ebp
+				pop esp
+				pop edi
+				pop esi
+				pop edx
+				pop ecx
+				pop ebx
+
+				cmp eax, 0x0
+				je _Org
+				push eax
+				push g_objBoneId3.m_pRet
+				add dword ptr[esp], 0x2
+				ret
+				_Org :
+				jmp g_objBoneId3.m_pRet
+			}
+		}
+
+
+
+		__declspec(naked) void Naked_fixBone5()
+		{
+			_asm
+			{
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
+				push esi
+				push edi
+				push esp
+				push ebp
+
+
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(get_bone_id, eax)
+
+				pop ebp
+				pop esp
+				pop edi
+				pop esi
+				pop edx
+				pop ecx
+				pop ebx
+
+				cmp eax, 0x0
+				je _Org
+				push eax
+				push g_objBoneId5.m_pRet
+				add dword ptr[esp], 0x2
+				ret
+				_Org :
+				jmp g_objBoneId5.m_pRet
+			}
+		}
+
+
+		__declspec(naked) void Naked_fixBone6()
+		{
+			_asm
+			{
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
+				push esi
+				push edi
+				push esp
+				push ebp
+
+
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(get_bone_id, eax)
+
+				pop ebp
+				pop esp
+				pop edi
+				pop esi
+				pop edx
+				pop ecx
+				pop ebx
+				
+				cmp eax, 0x0
+				je _Org
+				push eax
+				push g_objBoneId6.m_pRet
+				add dword ptr[esp], 0x2
+				ret
+				_Org :
+				jmp g_objBoneId6.m_pRet
+			}
+		}
+
+
+		__declspec(naked) void Naked_fixBone4()
+		{
+			_asm
+			{
+				mov ecx, dword ptr ds : [ebx + 0x294]
+				push ebx
+				push ecx
+				push edx
+				push esi
+				push edi
+				push esp
+				push ebp
+
+
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(get_bone_id, eax)
+
+				pop ebp
+				pop esp
+				pop edi
+				pop esi
+				pop edx
+				pop ecx
+				pop ebx
+
+				cmp eax, 0x0
+				je _Org
+				push eax
+				push g_objBoneId4.m_pRet
+				add dword ptr [esp], 0x2
+				ret
+				_Org :
+				jmp g_objBoneId4.m_pRet
+			}
+		}
+
+
+		__declspec(naked) void Naked_rotate_4()
+		{
+			_asm
+			{
 				pushad
-				MYASMCALL_1(is_set_hidden_flag, ecx)
-				cmp al, 0x0
-				je __NotSeet
-				
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(is_rotate_player, eax)
+				test al, al
 				popad
-				mov dword ptr[eax + 0x124], 0x1
-				jmp g_objSetFlag.m_pRet
-				
-				__NotSeet :
+				je __Org
+				mov dword ptr[eax + 0x28], 0x3f800000 // float 1
+
+				__Org:
+				push eax
+					lea eax, dword ptr [esp + 0x1B8]
+					jmp g_objRotate4.m_pRet
+			}
+		}
+
+
+
+		__declspec(naked) void Naked_rotate_3()
+		{
+			_asm
+			{
+				pushad
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(is_rotate_player, eax)
+				test al, al
 				popad
-					jmp g_objSetFlag.m_pRet
+				je __Org
+				mov dword ptr[eax + 0x28], 0x3f800000 // float 1
+
+				__Org:
+				push eax
+					lea eax, dword ptr  [esp + 0x168]
+					jmp g_objRotate3.m_pRet
+			}
+		}
+
+
+
+		__declspec(naked) void Naked_rotate_2()
+		{
+			_asm
+			{
+				pushad
+				movzx eax, byte ptr[ebx + 0x385]
+				MYASMCALL_1(is_rotate_player, eax)
+				test al, al
+				popad
+				je __Org
+				mov dword ptr[eax + 0x28], 0x3f800000 // float 1
+
+				__Org:
+				push eax
+					lea ecx, dword ptr[esp + 0x54]
+					jmp g_objRotate2.m_pRet
+			}
+		}
+		
+
+		__declspec(naked) void Naked_rotate()
+		{
+			_asm
+			{
+				pushad
+				movzx eax,byte ptr [ebx+0x385]
+				MYASMCALL_1(is_rotate_player,eax)
+				test al,al
+				popad
+				je __Org
+				mov dword ptr[eax + 0x28],0x3f800000 // float 1
+
+				__Org:
+				push eax
+				lea ecx, dword ptr [esp + 0x54]
+				jmp g_objRotate1.m_pRet
+			}
+		}
+
+		DWORD dwCallOrgFixHeightCall = 0x00552EC0;
+		__declspec(naked) void Naked_fixHeight()
+		{
+			_asm
+			{
+				pushad
+				mov eax,dword ptr [esi+0x74] 
+				MYASMCALL_2(fix_height,ecx,eax)
+				popad
+				call dwCallOrgFixHeightCall
+				jmp g_objFixHeight.m_pRet
 			}
 		}
 
@@ -103,12 +475,20 @@ namespace Shaiya90
 		void process_server_message(void* packet)
 		{
 #ifndef _DEBUG
-			VMProtectBegin(__FUNCDNAME__);
+			VMProtectBegin(__FUNCTION__);
 #endif
 			ShaiyaUtility::Packet::NewHiddenMount* p = (struct ShaiyaUtility::Packet::NewHiddenMount*)packet;
-			for (int i = 0;i < g_modelIds.size();i++)
+
+			g_models.fill({});
+
+			for (int i = 0;i <100;i++)
 			{
-				g_modelIds[i] = p->modelIds[i];
+				const BYTE id = p->models[i].id;
+				if(id==0)
+				{
+					continue;
+				}
+				g_models[id] = { true, p->models[i].need_rotate,p->models[i].height,p->models[i].boneId };
 			}
 			static bool flag = false;
 			if (flag)
@@ -118,8 +498,25 @@ namespace Shaiya90
 			flag = true;
 			BYTE limitMountModel = 0x57;
 			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x004C81F5, &limitMountModel, 1);
-			g_objSetFlag.Hook((void*)p->Naked_SetFlagAddr, Naked_SetFlag, 7);
-			g_objHidden.Hook((void*)p->Naked_Hidden, Naked_Hidden, 5);
+		    g_objRotate1.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate1), Naked_rotate, 5);
+			g_objRotate2.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate2), Naked_rotate_2, 5);
+			g_objRotate3.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate3), Naked_rotate_3, 8);
+			g_objRotate4.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate4), Naked_rotate_4, 8);
+			
+			g_objBoneId1.Hook(reinterpret_cast<void*>(p->Naked_fixboneId1), Naked_fixBone1, 6);
+		    g_objBoneId2.Hook(reinterpret_cast<void*>(p->Naked_fixboneId2), Naked_fixBone2, 6);
+			g_objBoneId3.Hook(reinterpret_cast<void*>(p->Naked_fixboneId3), Naked_fixBone3, 6);
+			g_objBoneId4.Hook(reinterpret_cast<void*>(p->Naked_fixboneId4), Naked_fixBone4, 6);
+			g_objBoneId5.Hook(reinterpret_cast<void*>(p->Naked_fixboneId5), Naked_fixBone5, 6);
+			g_objBoneId6.Hook(reinterpret_cast<void*>(p->Naked_fixboneId6), Naked_fixBone6, 6);
+			g_objBoneId7.Hook(reinterpret_cast<void*>(p->Naked_fixboneId7), Naked_fixBone7, 6);
+			g_objBoneId8.Hook(reinterpret_cast<void*>(p->Naked_fixboneId8), Naked_fixBone8, 6);
+
+
+			g_objFixHeight.Hook(reinterpret_cast<void*>(p->Naked_fixHeight), Naked_fixHeight, 5);
+
+     
+			
 #ifndef _DEBUG
 			VMProtectEnd();
 #endif
@@ -128,11 +525,13 @@ namespace Shaiya90
 		void start()
 		{
 #ifndef _DEBUG
-			VMProtectBegin(__FUNCDNAME__);
+			VMProtectBegin(__FUNCTION__);
 #endif
-			BYTE maxObjectSize = 0x28;
-			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x0041799A, &maxObjectSize, 1);
+	//		BYTE maxObjectSize = 0x28;
+	//		ShaiyaUtility::WriteCurrentProcessMemory((void*)0x0041799A, &maxObjectSize, 1);
 
+	
+			
 #ifndef _DEBUG
 			VMProtectEnd();
 #endif
