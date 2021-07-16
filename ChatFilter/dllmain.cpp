@@ -24,6 +24,7 @@
 #include "custom_packet.hpp"
 #include "customized_3.hpp"
 #include "newmount.hpp"
+#include "naked_skill.h"
 
 bool IsInjectAble() {
 
@@ -424,6 +425,7 @@ void Main()
 		CustomPacket::start();
 		customized_3::start();
 		NewMount::start();
+		NakedSkill::start();
 #ifndef  _DEBUG
 	}
 

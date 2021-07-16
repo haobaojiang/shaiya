@@ -88,6 +88,9 @@
     <ClInclude Include="newmount.hpp">
       <Filter>features</Filter>
     </ClInclude>
+    <ClInclude Include="naked_skill.h">
+      <Filter>features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

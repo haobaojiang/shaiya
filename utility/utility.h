@@ -225,6 +225,7 @@ namespace ShaiyaUtility::Packet {
 		itemCombines,
 		enhanceAttack,
 		hiddenMountCode,
+		NakedSkillSetting,
 	};
 
 	enum { RandomColor = 0xffffffff };
@@ -260,17 +261,58 @@ namespace ShaiyaUtility::Packet {
 		Notice() :Header(Code(0xf90b)) {}
 	};
 
+	struct MontModel
+	{
+		BYTE id{};
+		bool need_rotate{};
+		float height{};
+		BYTE boneId{};
+	};
+
+
+
+	struct NakedSkillEffect:Header
+	{
+		BYTE maps[20]{};// supporting maximum setting 20 maps
+		bool enabled{};
+		DWORD hookObj1 = 0x00450370;
+		DWORD hookObj2 = 0x0040f620;
+		DWORD hookObj3 = 0x00432A80;
+		DWORD hookObj4 = 0x0044FEC0;
+		DWORD hookObj5 = 0x00450300;
+		DWORD hookObj6 = 0x00417750;
+		NakedSkillEffect() :Header(NakedSkillSetting)
+		{
+
+		}
+	};
+	
 
 	struct NewHiddenMount:Header
 	{
-		BYTE modelIds[100]{};
-		DWORD Naked_SetFlagAddr = 0x004179D3;
-		DWORD Naked_Hidden = 0x004314BE;
-		NewHiddenMount():Header(hiddenMountCode)
-		{
+	MontModel models[100];
+	DWORD Naked_fixCharacterRotate1 = 0x0041331A;
+	DWORD Naked_fixCharacterRotate2 = 0x00413393;
+	DWORD Naked_fixCharacterRotate3 = 0x00413504;
+	DWORD Naked_fixCharacterRotate4 = 0x00413447;
+	DWORD Naked_fixCharacterRotate5 = 0x004134cb;
+	DWORD Naked_fixboneId1 = 0x004132E9; 
+	DWORD Naked_fixboneId2 = 0x0041330D; 
+	DWORD Naked_fixboneId3 = 0x00413362; 
+	DWORD Naked_fixboneId4 = 0x00413386;
+	DWORD Naked_fixboneId5 = 0x00413498;
+	DWORD Naked_fixboneId6 = 0x004134f7;
+	DWORD Naked_fixboneId7 = 0x004133db; 
+	DWORD Naked_fixboneId8 = 0x0041343a; 
+
+
+		
+	DWORD Naked_fixHeight = 0x00432A6E;
+	NewHiddenMount():Header(hiddenMountCode)
+	{
 			
-		}
-	};
+	}
+};
 
 	// name color
 	struct NameColorContent :Header {

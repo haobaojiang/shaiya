@@ -121,6 +121,7 @@
     <ClInclude Include="itemmap.hpp" />
     <ClInclude Include="killsRanking.hpp" />
     <ClInclude Include="linking.hpp" />
+    <ClInclude Include="naked_skill.h" />
     <ClInclude Include="namecolor.hpp" />
     <ClInclude Include="newmount.hpp" />
     <ClInclude Include="onLogin.hpp" />

@@ -14,6 +14,18 @@
 namespace Shaiya90
 {
 
+	std::optional<WORD> get_cur_map()
+	{
+		__try
+		{
+			auto cur_map = *reinterpret_cast<PWORD>(0x00863624);
+			return cur_map;
+		}
+		__except (1) {
+			return std::nullopt;
+		}
+	}
+	
 	void SendPacket(void* p, DWORD  l)
 	{
 		DWORD dwCall = 0x00595140;
@@ -22,6 +34,304 @@ namespace Shaiya90
 			push p
 			call dwCall
 			add esp, 0x8
+		}
+	}
+
+	namespace skillEffect
+	{
+		bool g_enabled{};
+		bool g_ignore_maps[255]{};
+
+		ShaiyaUtility::CMyInlineHook g_obj1;
+		__declspec(naked) void Naked_1()
+		{
+			_asm
+			{
+				lea eax, g_enabled
+				cmp byte ptr[eax], 0x0
+				je __org
+
+				push eax
+				push ebx
+				mov eax, 0x00863624
+				mov al, byte ptr [eax]
+				movzx eax,al
+				lea ebx, g_ignore_maps
+				lea ebx,[ebx+eax]
+				mov al,byte ptr [ebx]
+				test al,al
+				pop ebx
+				pop eax
+				jne __org
+
+				ret 0x1c
+
+				__org:
+				sub esp, 0x24
+					push ebp
+					mov ebp, [esp + 0x40]
+					jmp g_obj1.m_pRet
+			}
+		}
+
+
+
+		ShaiyaUtility::CMyInlineHook g_obj2;
+		__declspec(naked) void Naked_2()
+		{
+			_asm
+			{
+				lea eax, g_enabled
+				cmp byte ptr[eax], 0x0
+				je __org
+
+				push eax
+				push ebx
+				mov eax, 0x00863624
+				mov al, byte ptr[eax]
+				movzx eax, al
+				lea ebx, g_ignore_maps
+				lea ebx, [ebx + eax]
+				mov al, byte ptr[ebx]
+				test al, al
+				pop ebx
+				pop eax
+				jne __org
+
+
+				ret 0x8
+
+				__org:
+				sub esp, 0x1C
+					mov eax, [esp + 0x20]
+					jmp g_obj2.m_pRet
+			}
+		}
+
+
+		ShaiyaUtility::CMyInlineHook g_obj3;
+		__declspec(naked) void Naked_3()
+		{
+			_asm
+			{
+				lea eax, g_enabled
+				cmp byte ptr[eax], 0x0
+				je __org
+
+				push eax
+				push ebx
+				mov eax, 0x00863624
+				mov al, byte ptr[eax]
+				movzx eax, al
+				lea ebx, g_ignore_maps
+				lea ebx, [ebx + eax]
+				mov al, byte ptr[ebx]
+				test al, al
+				pop ebx
+				pop eax
+				jne __org
+
+
+				ret 0x8
+
+				__org:
+				mov eax, [esp + 0x04]
+					sub esp, 0x10
+					jmp g_obj3.m_pRet
+			}
+		}
+
+		ShaiyaUtility::CMyInlineHook g_obj4;
+		__declspec(naked) void Naked_4()
+		{
+			_asm
+			{
+				lea eax, g_enabled
+				cmp byte ptr[eax], 0x0
+				je __org
+
+				push eax
+				push ebx
+				mov eax, 0x00863624
+				mov al, byte ptr[eax]
+				movzx eax, al
+				lea ebx, g_ignore_maps
+				lea ebx, [ebx + eax]
+				mov al, byte ptr[ebx]
+				test al, al
+				pop ebx
+				pop eax
+				jne __org
+
+
+				ret 0x18
+
+				__org:
+				mov eax, [esp + 0x04]
+					sub esp, 0x8
+					jmp g_obj4.m_pRet
+			}
+		}
+
+		ShaiyaUtility::CMyInlineHook g_obj5;
+		__declspec(naked) void Naked_5()
+		{
+			_asm
+			{
+				lea eax, g_enabled
+				cmp byte ptr[eax], 0x0
+				je __org
+
+				push eax
+				push ebx
+				mov eax, 0x00863624
+				mov al, byte ptr[eax]
+				movzx eax, al
+				lea ebx, g_ignore_maps
+				lea ebx, [ebx + eax]
+				mov al, byte ptr[ebx]
+				test al, al
+				pop ebx
+				pop eax
+				jne __org
+
+
+				ret 0x14
+
+				__org:
+				push ebx
+					mov ebx, [esp + 0x14]
+					jmp g_obj5.m_pRet
+			}
+		}
+
+
+		ShaiyaUtility::CMyInlineHook g_obj6;
+		__declspec(naked) void Naked_6()
+		{
+			_asm
+			{
+				lea eax, g_enabled
+				cmp byte ptr[eax], 0x0
+				je __org
+
+				push eax
+				push ebx
+				mov eax, 0x00863624
+				mov al, byte ptr[eax]
+				movzx eax, al
+				lea ebx, g_ignore_maps
+				lea ebx, [ebx + eax]
+				mov al, byte ptr[ebx]
+				test al, al
+				pop ebx
+				pop eax
+				jne __org
+
+
+				ret 0xc
+
+				__org:
+				mov eax, [esp + 0x04]
+					sub esp, 0x10
+					jmp g_obj6.m_pRet
+			}
+		}
+
+		bool __stdcall is_skip_chat(BYTE* packet)
+		{
+			auto str = reinterpret_cast<char*>(packet + 3);
+			if (strcmp(str, "开技效") == 0)
+			{
+				g_enabled = false;
+				return true;
+			}
+			if (strcmp(str, "关技效") == 0)
+			{
+				g_enabled = true;
+				return true;
+			}
+			return false;
+		}
+
+
+		ShaiyaUtility::CMyInlineHook g_hookGmChat;
+		DWORD orgGmCall = 0x00595140;
+		__declspec(naked) void Naked_GmChat()
+		{
+			_asm
+			{
+				pushad
+				mov eax, dword ptr[esp + 0x20]
+				MYASMCALL_1(is_skip_chat, eax)
+				test al, al
+				popad
+				je _org
+				jmp g_hookGmChat.m_pRet
+
+				_org :
+				call orgGmCall
+					jmp g_hookGmChat.m_pRet
+
+			}
+		}
+
+
+
+		void process_server_message(void* packet)
+		{
+#ifndef _DEBUG
+			VMProtectBegin(__FUNCTION__);
+#endif
+
+			auto p = reinterpret_cast<ShaiyaUtility::Packet::NakedSkillEffect*>(packet);
+			static bool flag = false;
+			if (flag)
+			{
+				return;
+			}
+			flag = true;
+
+			ZeroMemory(g_ignore_maps, sizeof(g_ignore_maps));
+			for(auto i=0;i<_countof(p->maps);i++)
+			{
+				const BYTE m = p->maps[i];
+				if(m==0)
+				{
+					continue;
+				}
+				//in case of map 0
+				g_ignore_maps[m-1] = true;
+			}
+			
+			g_obj1.Hook(p->hookObj1, Naked_1, 8);
+			g_obj2.Hook(p->hookObj2, Naked_2, 7);
+			g_obj3.Hook(p->hookObj3, Naked_3, 7);
+			g_obj4.Hook(p->hookObj4, Naked_4, 7);
+			g_obj5.Hook(p->hookObj5, Naked_5, 5);
+			g_obj6.Hook(p->hookObj6, Naked_6, 7);
+			g_hookGmChat.Hook(0x00596c9c, Naked_GmChat, 5);
+
+
+#ifndef _DEBUG
+			VMProtectEnd();
+#endif
+		}
+
+		void start()
+		{
+#ifdef _DEBUG
+			g_enabled = true;
+			/*
+			g_obj1.Hook(0x00450370, Naked_1, 8);
+			g_obj2.Hook(0x0040f620, Naked_2, 7);
+			g_obj3.Hook(0x00432A80, Naked_3, 7);
+			g_obj4.Hook(0x0044FEC0, Naked_4, 7);
+			g_obj5.Hook(0x00450300, Naked_5, 5);
+			g_obj6.Hook(0x00417750, Naked_6, 7);
+			g_hookGmChat.Hook(0x00596c9c, Naked_GmChat, 5);
+			*/
+#endif
 		}
 	}
 
@@ -47,6 +357,8 @@ namespace Shaiya90
 		ShaiyaUtility::CMyInlineHook g_objBoneId7;// 
 		ShaiyaUtility::CMyInlineHook g_objBoneId8;
 		ShaiyaUtility::CMyInlineHook g_objFixHeight;
+
+		DWORD g_bone1Addr = 0x004132E9;
 
 
 		void __stdcall fix_height(DWORD mountObj,BYTE modelId)
@@ -144,9 +456,7 @@ namespace Shaiya90
 
 				cmp eax, 0x0
 				je _Org
-				push eax
-				push g_objBoneId7.m_pRet
-				add dword ptr[esp], 0x2
+				jmp g_bone1Addr
 				ret
 				_Org :
 				jmp g_objBoneId7.m_pRet
@@ -254,9 +564,8 @@ namespace Shaiya90
 
 				cmp eax, 0x0
 				je _Org
-				push eax
-				push g_objBoneId3.m_pRet
-				add dword ptr[esp], 0x2
+				jmp g_bone1Addr
+				
 				ret
 				_Org :
 				jmp g_objBoneId3.m_pRet
@@ -292,10 +601,7 @@ namespace Shaiya90
 
 				cmp eax, 0x0
 				je _Org
-				push eax
-				push g_objBoneId5.m_pRet
-				add dword ptr[esp], 0x2
-				ret
+				jmp g_bone1Addr
 				_Org :
 				jmp g_objBoneId5.m_pRet
 			}
@@ -499,18 +805,17 @@ namespace Shaiya90
 			BYTE limitMountModel = 0x57;
 			ShaiyaUtility::WriteCurrentProcessMemory((void*)0x004C81F5, &limitMountModel, 1);
 		    g_objRotate1.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate1), Naked_rotate, 5);
-			g_objRotate2.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate2), Naked_rotate_2, 5);
-			g_objRotate3.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate3), Naked_rotate_3, 8);
-			g_objRotate4.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate4), Naked_rotate_4, 8);
+	//		g_objRotate2.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate2), Naked_rotate_2, 5);
+	//		g_objRotate3.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate3), Naked_rotate_3, 8);
+	//		g_objRotate4.Hook(reinterpret_cast<void*>(p->Naked_fixCharacterRotate4), Naked_rotate_4, 8);
 			
 			g_objBoneId1.Hook(reinterpret_cast<void*>(p->Naked_fixboneId1), Naked_fixBone1, 6);
 		    g_objBoneId2.Hook(reinterpret_cast<void*>(p->Naked_fixboneId2), Naked_fixBone2, 6);
+			
 			g_objBoneId3.Hook(reinterpret_cast<void*>(p->Naked_fixboneId3), Naked_fixBone3, 6);
-			g_objBoneId4.Hook(reinterpret_cast<void*>(p->Naked_fixboneId4), Naked_fixBone4, 6);
 			g_objBoneId5.Hook(reinterpret_cast<void*>(p->Naked_fixboneId5), Naked_fixBone5, 6);
-			g_objBoneId6.Hook(reinterpret_cast<void*>(p->Naked_fixboneId6), Naked_fixBone6, 6);
 			g_objBoneId7.Hook(reinterpret_cast<void*>(p->Naked_fixboneId7), Naked_fixBone7, 6);
-			g_objBoneId8.Hook(reinterpret_cast<void*>(p->Naked_fixboneId8), Naked_fixBone8, 6);
+
 
 
 			g_objFixHeight.Hook(reinterpret_cast<void*>(p->Naked_fixHeight), Naked_fixHeight, 5);
@@ -537,6 +842,9 @@ namespace Shaiya90
 #endif
 		}
 	}
+
+
+
 
 
 	namespace multipleClient
@@ -954,6 +1262,11 @@ namespace Shaiya90
 			case ShaiyaUtility::Packet::hiddenMountCode:
 				{
 				NewMountFeature::process_server_message(P);
+				break;
+				}
+			case ShaiyaUtility::Packet::NakedSkillSetting:
+				{
+				skillEffect::process_server_message(P);
 				break;
 				}
 				
@@ -1387,6 +1700,7 @@ namespace Shaiya90
 		getEnhanceAttack::Start();
 		multipleClient::start();
 		NewMountFeature::start();
+		skillEffect::start();
 	}
 
 }
