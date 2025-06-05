@@ -30,6 +30,9 @@
     <Filter Include="源文件\13.0">
       <UniqueIdentifier>{267fc041-33c9-4103-b386-b049ba544389}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\11.0">
+      <UniqueIdentifier>{0fe279f4-526d-465a-accd-13704b390d00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -58,5 +61,10 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="11.0.h">
+      <Filter>源文件\11.0</Filter>
+    </None>
   </ItemGroup>
 </Project>

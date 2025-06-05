@@ -351,8 +351,8 @@ namespace Shaiya50
 				encryptedStr.push_back(Buf[i+4] ^ signature);
 			}
 			// base64 buf
-			auto decryptedStr = Utility::base64_decode(encryptedStr.c_str());
-			memcpy(&Buf[2], decryptedStr.data(), decryptedStr.length());
+			auto decryptedStr = Utility::Crypt::base64_decode(encryptedStr.c_str());
+			memcpy(&Buf[2], decryptedStr.data(), decryptedStr.size());
 
 
 #ifndef _DEBUG

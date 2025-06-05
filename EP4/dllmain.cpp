@@ -9,7 +9,7 @@
 #include "itemMap.hpp"
 #include "encryptReadChar.h"
 #include "enhanceDelay.hpp"
-
+#include "singleparty.h"
 void ItemSaveModLogging(DWORD Eax,DWORD charid) {
 	auto itemid = ShaiyaUtility::read<DWORD>(Eax + 0x18);
 	auto count = ShaiyaUtility::read<BYTE>(Eax + 0x1e);
@@ -491,6 +491,7 @@ void Main()
 
 	LOGD << "after InitGame";
 
+	SingleParty::start();
 	InstantMount::Start();
 	itemForMap::start();
 	EncryptReadChar::Start();

@@ -6,23 +6,38 @@
 
 
 
+void f1111(float x)
+{
+	if (x > 0) {
+		printf("%f\n", 0-x);
+	}
+	else {
+		printf("%f\n", std::abs(x));
+	}
+}
 
+
+
+
+template<typename T> struct RequiredField {
+	T value;
+	explicit(false) constexpr RequiredField(T v) :value{ std::move(v) } {
+	}
+};
+
+
+struct testStruct {
+	int a;
+	RequiredField<int> b;
+};
 
 
 
 int main(int argc, char* argv[])
 {
 
-	int a[] = { 0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0x10,0x10 ,0x10 ,0x10 ,0x10 ,0x11,0x12,0x10 ,0x10 ,0x10 ,0x10 ,0x10 ,0x15,0x10,0x10 };
-
-	printf("%p", a);
-	/*
-	while (!IsDebuggerPresent())
-	{
-		Sleep(1000);
-	}
-	Sleep(1000);
-	*/
+	testStruct obj(); 
+/*
 
 	DWORD pid{};
 	auto hr = Utility::Process::FindProcessIdByName(L"shaiya.exe", &pid);
@@ -91,5 +106,7 @@ int main(int argc, char* argv[])
 	
 	printf("end\n");
 	system("pause");
+	*/
 	return 0;
+
 }

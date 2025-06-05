@@ -28,6 +28,7 @@
 
 #include "90.h"
 #include "50.h"
+#include "11.0.h"
 
 HMODULE g_hModule = NULL;
 
@@ -43,8 +44,10 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 #ifndef _SHAIYA_90
 		Shaiya50::Start();
 #else
+	//	Shaiya11::start();
 		Shaiya90::Start();
 #endif
+	
 		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:

@@ -25,6 +25,11 @@
 #include "customized_3.hpp"
 #include "newmount.hpp"
 #include "naked_skill.h"
+#include "player_title.hpp"
+#include "mob_spawn_notice.hpp"
+#include "recrune.hpp"
+#include "singleparty.h"
+
 
 bool IsInjectAble() {
 
@@ -140,6 +145,7 @@ bool getHookInfo() {
 
 }
 */
+
 
 
 
@@ -346,6 +352,7 @@ void subProcess(void* p) {
 	*/
 }
 #include "../utility/file.h"
+/*
 #ifndef _DEBUG
 #include "VMProtectSDK.h"
 bool check_vmp_license() {
@@ -370,22 +377,26 @@ bool check_vmp_license() {
 
 }
 #endif
+*/
 
 void Main()
 {
 
 
 
+	/*
 #ifndef  _DEBUG
 	VMProtectBegin(__FUNCTION__);
 #endif
+	*/
 
 
+	/*
 #ifndef  _DEBUG
 	if (check_vmp_license()) {
 #endif
-
-
+*/
+	
 
 
 
@@ -404,6 +415,10 @@ void Main()
 
 		LOGD << "after InitGame";
 
+
+		
+		
+		SingleParty::start();
 		getPlayer::Start();
 		NameColor::Start();
 		SkillCutting::Start();
@@ -426,6 +441,11 @@ void Main()
 		customized_3::start();
 		NewMount::start();
 		NakedSkill::start();
+		PlayerTitle::Start();
+		MobSpawnNotice::start();
+		RecRune::start();
+	
+		/*
 #ifndef  _DEBUG
 	}
 
@@ -434,29 +454,76 @@ void Main()
 		ExitProcess(0);
 	}
 #endif
+	*/
 
+	/*
 #ifndef  _DEBUG
 	VMProtectEnd();
 #endif
+	*/
 }
+
+
+
+ShaiyaUtility::CMyInlineHook obj1;
+
+DWORD orgAddr = 0;
+
+
+bool __stdcall Filter(void* Player, PBYTE pPackets)
+{
+	char* strChat = (char*)&pPackets[3];
+	return strstr(strChat, "<<999c01") == NULL;
+}
+
+DWORD falledAddr = 0x0047FC57;
+__declspec(naked) void  Naked_ChatFilter()
+{
+	_asm
+	{
+		pushad
+		MYASMCALL_2(Filter, ebp, ebx)
+		test al, al
+		popad
+		jne _Org
+		jmp falledAddr
+
+		_Org :
+		jmp orgAddr
+	}
+}
+
+
+void mainFun(void*)
+{
+	Sleep(6000);
+	orgAddr = (DWORD)LoadLibrary(L"dbghelp.dll");
+	orgAddr += 0x97e0;
+	obj1.Hook((PVOID)0x0047f4ba, Naked_ChatFilter, 7);
+}
+
 
 BOOL APIENTRY DllMain(
 	HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
 )
-{
+{ 
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+
+		
 		if (!IsInjectAble()) {
 			break;
 		}
-
+		
 		if (!InitLogging()) {
 			break;
 		}
 		Main();
+		
+	//	_beginthread(mainFun, 0, 0);
 		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:

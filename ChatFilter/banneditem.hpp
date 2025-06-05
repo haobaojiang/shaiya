@@ -8,23 +8,24 @@
 namespace banned_item {
 
 
-	WORD g_map = 0;
-	std::vector<DWORD> g_items;
+	struct BanItem  {
+		BYTE mapId = 0;
+		DWORD itemId = 0;
+	};
+
+	std::vector<BanItem> g_items;
 	ShaiyaUtility::CMyInlineHook g_obj;
 
 
 	bool __stdcall item_usable(void* player,DWORD ItemObj) {
-
-		if (ShaiyaUtility::EP6::PlayerMap(player) != g_map) {
-			return true;
-		}
-
+		auto playerMap = ShaiyaUtility::EP6::PlayerMap(player);
 		auto itemid = ShaiyaUtility::EP6::ItemObjToItemid(ItemObj);
-		auto iter = std::find(g_items.begin(),g_items.end(), itemid);
-		if (iter == g_items.end()) {
-			return true;
+		for (auto item : g_items) {
+			if (item.mapId == playerMap && item.itemId == itemid) {
+				return false;
+			}
 		}
-		return false;
+		return true;
 	}
 
 	DWORD failedAddr = 0x0047469F;
@@ -51,22 +52,24 @@ namespace banned_item {
 			return;
 		}
 
-		// read map
-		g_map = static_cast<WORD>(GameConfiguration::GetInteger(section, "map", -1));
+
 
 
 		// read items
 		for (auto i = 0; i < 100; i++) {
 			char key[50]{};
 			sprintf(key, "%d", i);
-
-			auto item = GameConfiguration::GetInteger(section, key, 0);
-			if (item == 0) {
-				continue;
+			LOGD << "banned item key:" << key;
+			auto val = GameConfiguration::Get(section, key);
+			LOGD << "banned item val:" << val;
+			if (val == "") {
+				break;
 			}
-
-			LOGD << "banned item:" << item;
-			g_items.push_back(item);
+			DWORD mapId = 0;
+			DWORD itemId = 0;
+			sscanf(val.c_str(), "%d,%d", &mapId,&itemId);
+			LOGD << "banned item:" << itemId;
+			g_items.push_back(BanItem{static_cast<BYTE>(mapId),itemId});
 		}
 
 		// 00472E23  |.  83B9 A0000000 1A    cmp dword ptr ds:[ecx+0xA0],0x1A

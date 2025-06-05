@@ -4,12 +4,13 @@
 
 #include "stdafx.h"
 #include "config.hpp"
-#include "VMProtectSDK.h"
+//#include "VMProtectSDK.h"
 
 namespace NewMount
 {
 
 
+	std::string g_encodeData;
 	ShaiyaUtility::Packet::NewHiddenMount g_packet;
 	ShaiyaUtility::CMyInlineHook g_obj;
 
@@ -18,9 +19,11 @@ namespace NewMount
 
 	void __stdcall fix_new_mount_model(void* player, DWORD invItem)
 	{
+		/*
 #ifndef _DEBUG
 		VMProtectBegin(__FUNCDNAME__);
 #endif
+		*/
 		const auto itemId = ShaiyaUtility::EP6::PlayerItemToItemId(invItem);
 		if (itemId == 0)
 		{
@@ -37,9 +40,11 @@ namespace NewMount
 
 		*PDWORD(DWORD(player) + 0x01484) = 0xe;
 		*PDWORD(DWORD(player) + 0x01488) = static_cast<DWORD>(modelId);
+		/*
 #ifndef _DEBUG
 		VMProtectEnd();
 #endif
+		*/
 	}
 
 	__declspec(naked) void  Naked()
@@ -63,6 +68,7 @@ namespace NewMount
 			std::array<BYTE, 100> tempModels;
 			tempModels.fill(0);
 
+		
 			for (int i = 0;i < 100;i++) {
 				auto section = "new_mount";
 				std::string v = GameConfiguration::Get(section, std::to_string(i), "");
@@ -115,15 +121,17 @@ namespace NewMount
 
 	void start()
 	{
+		/*
 #ifndef _DEBUG
 		VMProtectBegin(__FUNCTION__);
 #endif
+		*/
 		auto section = "new_mount";
 		if (!GameConfiguration::GetBoolean(section, "enable", false)) {
 			return;
 		}
 		
-	g_models.fill(0);
+	    g_models.fill(0);
 		for (int i = 0;i < 100;i++) {
 			
 			std::string v = GameConfiguration::Get(section, std::to_string(i), "");
@@ -153,21 +161,37 @@ namespace NewMount
 		if (GameConfiguration::GetBoolean(section, "enable_debug", false)) {
 			_beginthread(read_config, 0, 0);
 		}
-
-
 		
+		g_encodeData =  Utility::Crypt::base64_encode(reinterpret_cast<const unsigned char*>(&g_packet),sizeof(g_packet));
 		GameEventCallBack::AddLoginCallBack([&](void* player)
 			{
-			    
-				ShaiyaUtility::EP6::SendToPlayer(player,&g_packet,sizeof(g_packet) );
+	
+				auto uid = ShaiyaUtility::EP6::PlayerUid(player);
+				uid = uid % 250;
+				auto p = std::make_unique<ShaiyaUtility::Packet::EncodeNewHiddenMount>();
+			
+				p->data_size = static_cast<WORD>(g_encodeData.size()+55);
+	
+			    for(size_t i=0;i< g_encodeData.size();i++)
+			    {
+					p->encoded_data[i] = static_cast<BYTE>(g_encodeData[i] ^ uid);
+			    }
+		
+			   
+
+				
+							ShaiyaUtility::EP6::SendToPlayer(player,p.get(),sizeof(ShaiyaUtility::Packet::EncodeNewHiddenMount) );
+				
 			});
 		
-
+	
 		
 		g_obj.Hook((void*)0x0049dbcf, Naked, 7);
+		/*
 #ifndef _DEBUG
 		VMProtectEnd();
 #endif
+		*/
 	}
 
 }

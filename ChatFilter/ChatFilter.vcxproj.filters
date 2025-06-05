@@ -3,6 +3,9 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="singleparty.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -89,6 +92,21 @@
       <Filter>features</Filter>
     </ClInclude>
     <ClInclude Include="naked_skill.h">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="player_title.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="mob_spawn_notice.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="randspawn.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="recrune.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="singleparty.h">
       <Filter>features</Filter>
     </ClInclude>
   </ItemGroup>

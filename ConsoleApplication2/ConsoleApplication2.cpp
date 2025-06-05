@@ -7,6 +7,8 @@
 
 int main()
 {
+
+
 	do {
 		continue; 
 	} while (false);

@@ -121,13 +121,18 @@
     <ClInclude Include="itemmap.hpp" />
     <ClInclude Include="killsRanking.hpp" />
     <ClInclude Include="linking.hpp" />
+    <ClInclude Include="mob_spawn_notice.hpp" />
     <ClInclude Include="naked_skill.h" />
     <ClInclude Include="namecolor.hpp" />
     <ClInclude Include="newmount.hpp" />
     <ClInclude Include="onLogin.hpp" />
     <ClInclude Include="party_hook.hpp" />
+    <ClInclude Include="player_title.hpp" />
     <ClInclude Include="randomRes.h" />
+    <ClInclude Include="randspawn.hpp" />
+    <ClInclude Include="recrune.hpp" />
     <ClInclude Include="ShareKills.h" />
+    <ClInclude Include="singleparty.h" />
     <ClInclude Include="skillCutting.hpp" />
     <ClInclude Include="skill_auto_kill.hpp" />
     <ClInclude Include="skill_tradechat.h" />
@@ -143,6 +148,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="singleparty.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

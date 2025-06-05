@@ -1,36 +1,49 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
-#include <Windows.h>
+#include <windows.h>
 #include <process.h>
 #include "../utility/process.h"
 #include <memory>
+#include "../utility/utility.h"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// µ¼³öº¯Êý
-#pragma comment(linker, "/EXPORT:ijlGetLibVersion=ijl15Org.ijlGetLibVersion,@1")
-#pragma comment(linker, "/EXPORT:ijlInit=ijl15Org.ijlInit,@2")
-#pragma comment(linker, "/EXPORT:ijlFree=ijl15Org.ijlFree,@3")
-#pragma comment(linker, "/EXPORT:ijlRead=ijl15Org.ijlRead,@4")
-#pragma comment(linker, "/EXPORT:ijlWrite=ijl15Org.ijlWrite,@5")
-#pragma comment(linker, "/EXPORT:ijlErrorStr=ijl15Org.ijlErrorStr,@6")
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "hijack.h"
 
 
-void testMem(void*)
+ShaiyaUtility::CMyInlineHook obj1;
+
+DWORD orgAddr = 0;
+
+
+bool __stdcall Filter(void* Player, PBYTE pPackets)
 {
-    auto* p = reinterpret_cast<PDWORD>(0x00500000);
+	char* strChat = (char*)&pPackets[3];
+	return strstr(strChat, "<<999c01") == NULL;
+}
 
-
-    wchar_t str[MAX_PATH]{};
-	for(auto i=0;i<1000;i++)
+DWORD falledAddr = 0x0047FC57;
+__declspec(naked) void  Naked_ChatFilter()
+{
+	_asm
 	{
-        const auto v = *(p);
-        StringCchPrintfW(str, MAX_PATH, L"%d", v);
-        OutputDebugStringW(str);
-        p++;
-        Sleep(100);
+		pushad
+		MYASMCALL_2(Filter, ebp, ebx)
+		test al, al
+		popad
+		jne _Org
+		jmp falledAddr
+
+		_Org:
+		jmp orgAddr
 	}
-	
+}
+
+
+void mainFun(void*)
+{
+	Sleep(6000);
+	orgAddr =(DWORD) LoadLibrary(L"dbghelp.dll");
+	orgAddr += 0x97e0;
+    obj1.Hook((PVOID)0x0047f4ba, Naked_ChatFilter, 7);
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -41,7 +54,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        _beginthread(testMem, 0, 0);
+        _beginthread(mainFun, 0, 0);
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
